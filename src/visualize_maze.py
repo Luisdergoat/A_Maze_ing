@@ -31,16 +31,46 @@ def convert_cells_to_maze_array(
 ) -> List[List[int]]:
     """
     Konvertiert ein 2D-Array von Cell-Objekten zu einem Bit-Maze Array.
-    Standardmäßig haben alle Zellen Wert 15 (alle Wände geschlossen).
+    Verwendet die Wand-Bits aus Cell.get_wall() (Bits: Oben=8, Rechts=4,
+    Unten=2, Links=1). Unterstützt beide Indexierungsarten: [y][x] und [x][y].
     """
     if not cell_maze or not cell_maze[0]:
         return []
 
+    def get_wall_value(cell: object) -> int:
+        if hasattr(cell, "get_wall"):
+            return int(cell.get_wall())
+        if hasattr(cell, "wall"):
+            return int(cell.wall)
+        return 15
+
+    # Heuristik: Prüfe, ob die erste Reihe wie [y][x] oder [x][y] aussieht.
+    is_transposed = False
+    try:
+        if len(cell_maze[0]) > 1:
+            sample = cell_maze[0][1]
+            is_row_major = (
+                getattr(sample, "x", None) == 1
+                and getattr(sample, "y", None) == 0
+            )
+            is_transposed = not is_row_major
+    except Exception:
+        is_transposed = False
+
+    if is_transposed:
+        width = len(cell_maze)
+        height = len(cell_maze[0])
+        return [
+            [get_wall_value(cell_maze[x][y]) for x in range(width)]
+            for y in range(height)
+        ]
+
     height = len(cell_maze)
     width = len(cell_maze[0])
-
-    # Erstelle Bit-Maze mit allen Wänden geschlossen
-    return [[15 for _ in range(width)] for _ in range(height)]
+    return [
+        [get_wall_value(cell_maze[y][x]) for x in range(width)]
+        for y in range(height)
+    ]
 
 
 def visualize_cell_maze(
