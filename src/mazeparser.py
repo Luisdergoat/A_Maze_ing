@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Hier wir die logik genommen aus der config.txt werden die regel eingesetzt
 und in ein maze umgewandelt.
@@ -87,11 +88,15 @@ def parse_maze_config():
         return None
 
     #  Initialisiere das Maze mit cells anstadt ints
-    maze = [[Cell(x, y) for x in range(config['WIDTH'])] for y
-            in range(config['HEIGHT'])]
+    # maze[y][x] mit y=0..HEIGHT+1, x=0..WIDTH+1
+    # Der Frame ist bei x=0, x=WIDTH+1, y=0, y=HEIGHT+1
+    maze = [[Cell(x, y) for x in range(config['WIDTH'] + 2)] for y
+            in range(config['HEIGHT'] + 2)]
 
-    maze_entry_x, maze_entry_y = config['ENTRY']
-
-    maze[maze_entry_y][maze_entry_x].mark_visited()
+    # Markiere Frame-Zellen (Rand)
+    for y in range(config['HEIGHT'] + 2):
+        for x in range(config['WIDTH'] + 2):
+            if x == 0 or x == config["WIDTH"] + 1 or y == 0 or y == config["HEIGHT"] + 1:
+                maze[y][x].mark_as_frame()
 
     return maze, config
