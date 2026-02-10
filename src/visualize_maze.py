@@ -17,12 +17,12 @@ from __future__ import annotations
 from typing import List, Mapping, Optional, Sequence, Tuple, cast
 
 import mazeparser
-from rich import box  # type: ignore
-from rich.console import Console  # type: ignore
-from rich.live import Live  # type: ignore
-from rich.panel import Panel  # type: ignore
-from rich.table import Table  # type: ignore
-from rich.text import Text  # type: ignore
+from rich import box
+from rich.console import Console
+from rich.live import Live
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
 console = Console()
 
@@ -91,7 +91,7 @@ def start_live_visualization(
     )
 
     # Erstelle eine zentierte Version des Panels
-    from rich.align import Align  # type: ignore
+    from rich.align import Align
 
     centered_panel = Align.center(panel)
 
@@ -110,7 +110,6 @@ def update_live_visualization(
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> None:
     """Aktualisiert Live-Visualisierung"""
-    global _live_display
 
     if _live_display is None:
         return

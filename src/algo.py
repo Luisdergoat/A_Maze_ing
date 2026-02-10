@@ -143,29 +143,21 @@ def remove_wall_between(
     :param maze: Description
     :param cell: Description
     """
-    N = 7   # 0111 - remove top wall
-    E = 11  # 1011 - remove right wall
-    S = 13  # 1101 - remove bottom wall
-    W = 14  # 1110 - remove left wall
+    N = 7   # 0111
+    E = 11  # 1011
+    S = 13  # 1101
+    W = 14  # 1110
     if direction == "N":
-        # Remove top wall of current cell
         maze[y][x].set_wall(N)  # type: ignore
-        # Remove bottom wall of cell above
         maze[y - 1][x].set_wall(S)  # type: ignore
     if direction == "E":
-        # Remove right wall of current cell
         maze[y][x].set_wall(E)  # type: ignore
-        # Remove left wall of cell to the right
         maze[y][x + 1].set_wall(W)  # type: ignore
     if direction == "S":
-        # Remove bottom wall of current cell
         maze[y][x].set_wall(S)  # type: ignore
-        # Remove top wall of cell below
         maze[y + 1][x].set_wall(N)  # type: ignore
     if direction == "W":
-        # Remove left wall of current cell
         maze[y][x].set_wall(W)  # type: ignore
-        # Remove right wall of cell to the left
         maze[y][x - 1].set_wall(E)  # type: ignore
 
 
@@ -212,7 +204,7 @@ def generat_maze(
     try:
         seed_int = int(seed_val)  # type: ignore
     except ValueError:
-        seed_int = int(random.random() * 1000000)
+        seed_int = random.randint(-2147483648, 2147483647)
     random.seed(seed_int)
 
     # sowas wie eine last cell muss gespeichert werden um zu wissen welche
@@ -279,13 +271,13 @@ def generate_output_file(
     assert isinstance(height_val, int)
     assert isinstance(width_val, int)
     with open(output_file, "w") as f:
-        for row in maze[1:height_val]:
-            for cell in row[1:width_val]:
+        for row in maze[1:height_val + 1]:
+            for cell in row[1:width_val + 1]:
                 f.write(f"{hex(cell.get_wall())[2:]}")  # type: ignore
             f.write("\n")
         f.write("\n")
-        f.write(f"{entry_x},{entry_x}\n")
-        f.write(f"{exit_x},{exit_x}\n")
+        f.write(f"{entry_x},{entry_y}\n")
+        f.write(f"{exit_x},{exit_y}\n")
 
 
 if __name__ == "__main__":

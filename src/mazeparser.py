@@ -138,12 +138,7 @@ def parse_maze_config(
     # Markiere Frame-Zellen (Rand)
     for y in range(height + 2):
         for x in range(width + 2):
-            if (
-                x == 0
-                or x == width + 1
-                or y == 0
-                or y == height + 1
-            ):
+            if (x == 0 or x == width + 1 or y == 0 or y == height + 1):
                 maze[y][x].mark_as_frame()
 
     return maze, config
