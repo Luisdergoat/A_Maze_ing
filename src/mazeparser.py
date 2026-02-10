@@ -4,8 +4,9 @@ Hier wir die logik genommen aus der config.txt werden die regel eingesetzt
 und in ein maze umgewandelt.
 """
 from typing import Dict, List, Optional, Tuple, Union
-
 from cell import Cell
+
+import os
 
 
 def read_out_config(
@@ -117,7 +118,9 @@ def parse_maze_config(
     ohne korrekten Weg zzwischen Entry und Exit.
     """
 
-    config = read_out_config("config.txt")
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    config_path = os.path.join(project_root, "config.txt")
+    config = read_out_config(config_path)
     if config is None:
         return None
 

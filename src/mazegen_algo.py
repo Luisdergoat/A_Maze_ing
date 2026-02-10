@@ -243,6 +243,7 @@ def generat_maze(
 
         # remove_wall_between(maze, last_cell, (x, y))
         # muss hier gemacht werden
+        perfect_maze = config["PERFECT"]
         if x == -1:
             if len(steps) > 0:
                 x, y = steps.pop()
@@ -279,27 +280,3 @@ def generate_output_file(
         f.write(f"{entry_x},{entry_y}\n")
         f.write(f"{exit_x},{exit_y}\n")
 
-
-if __name__ == "__main__":
-    result = mazeparser.parse_maze_config()
-    if result is not None:
-        maze, config = result
-
-        # Mit Animation (extrem schnell):
-        # animate=True, delay=0.00000000001
-        # Ohne Animation (schnell): animate=False
-        generat_maze(
-            maze,
-            config,
-            animate=False,
-            delay=0.00000000001,
-        )
-
-        # Finale Visualisierung mit allen Details
-        visualize_maze.visualize_cell_maze(
-            maze,
-            config,
-            clear_screen=True,
-        )
-
-        generate_output_file(maze, config)

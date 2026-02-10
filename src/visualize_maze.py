@@ -507,6 +507,7 @@ def print_maze_visual_rich(
             # Check for frame
             is_frame = False
             is_visited = False
+            is_solving = False
             if cell_maze:
                 try:
                     cell_obj = cell_maze[y][x]
@@ -514,6 +515,8 @@ def print_maze_visual_rich(
                         is_frame = cell_obj.frame
                     if hasattr(cell_obj, "visited"):
                         is_visited = cell_obj.visited
+                    if hasattr(cell_obj, "solve_need"):
+                        is_solving = cell_obj.solve_need
                 except (IndexError, AttributeError):
                     pass
 
@@ -534,6 +537,8 @@ def print_maze_visual_rich(
                 line.append(" X ", style="bold red")
             elif is_frame:
                 line.append("███", style="red")
+            elif is_solving:
+                line.append("███", style="bold blue")
             elif is_visited:
                 line.append(" · ", style="dim cyan")
             else:

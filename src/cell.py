@@ -14,6 +14,7 @@ class Cell:
         self.wall = 15
         self.visited = False
         self.frame = False
+        self.solve_need = False
 
     def __repr__(self) -> str:
         return (
@@ -32,6 +33,12 @@ class Cell:
 
     def is_visited(self) -> bool:
         return self.visited
+
+    def mark_need_to_solve(self):
+        self.solve_need = True
+
+    def unmark_need_to_solve(self):
+        self.solve_need = False
 
     def set_x(self, x: int) -> None:
         self.x = x
