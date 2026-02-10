@@ -3,20 +3,16 @@
 Hier wir die logik genommen aus der config.txt werden die regel eingesetzt
 und in ein maze umgewandelt.
 """
-from typing import Dict, List, Optional, Tuple, Union
-
 from cell import Cell
 
 
-def read_out_config(
-    file_path: str,
-) -> Optional[Dict[str, Union[int, bool, str, Tuple[int, int]]]]:
+def read_out_config(file_path) -> dict:
     """
     Nimmt die werte aus der Config.txt
     und gibt sie als dictionary zurueck
     die keys werden dann noch in integer und boolean umgewandelt.
     """
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]] = {}
+    config = {}
 
     try:
         #  Versucht die config datei zu oeffnen und die werte in ein Dict macht
@@ -38,51 +34,27 @@ def read_out_config(
                     config[key] = value
 
         #  checked ob alle Werte auch gegeben wurden
-        required_keys = [
-            "WIDTH",
-            "HEIGHT",
-            "ENTRY",
-            "EXIT",
-            "OUTPUT_FILE",
-            "PERFECT",
-            "SEED",
-        ]
+        required_keys = ['WIDTH', 'HEIGHT', 'ENTRY', 'EXIT', 'PERFECT']
 
         for key in required_keys:
             if key not in config:
                 raise ValueError(f"Missing required config key:{key}")
 
         #  checked ob die werte fuer die groesse des mazes passen
-        width: int = 0
-        height: int = 0
         for i in config:
             if i == "WIDTH":
-                val = config[i]
-                assert isinstance(val, int)
-                width = val
+                width = config[i]
             if i == "HEIGHT":
-                val = config[i]
-                assert isinstance(val, int)
-                height = val
+                height = config[i]
             if i == "ENTRY" or i == "EXIT":
-                val = config[i]
-                if isinstance(val, str):
-                    x, y = val.split(',')
-                    config[i] = (int(x.strip()), int(y.strip()))
+                x, y = config[i].split(',')
+                config[i] = (int(x.strip()), int(y.strip()))
 
         if width < 3 or height < 3:
-            raise ValueError(
-                "The Maze turned out to small. "
-                "At least 3x3 is required."
-            )
-        entry_tuple = config['ENTRY']
-        exit_tuple = config['EXIT']
-        if not isinstance(entry_tuple, tuple) or len(entry_tuple) != 2:
-            raise ValueError("ENTRY must be a tuple of two integers")
-        if not isinstance(exit_tuple, tuple) or len(exit_tuple) != 2:
-            raise ValueError("EXIT must be a tuple of two integers")
-        entry_x, entry_y = int(entry_tuple[0]), int(entry_tuple[1])
-        exit_x, exit_y = int(exit_tuple[0]), int(exit_tuple[1])
+            raise ValueError("The Maze turned out to small. "
+                             "At least 3x3 is required.")
+        entry_x, entry_y = config['ENTRY']
+        exit_x, exit_y = config['EXIT']
         if not 0 < entry_x < width:
             raise ValueError("The entry is out of bounds.")
         if not 0 < entry_y < height:
@@ -98,18 +70,12 @@ def read_out_config(
         print("ERROR: The config.txt file was not found ", e)
         return None
     except Exception as e:
-        print(
-            "ERROR: An error occurred while reading the config file: "
-            f"{e}"
-        )
+        print(f"ERROR: An error occurred while reading the config file: {e}")
         return None
     return config
 
 
-def parse_maze_config(
-) -> Optional[
-    Tuple[List[List[Cell]], Dict[str, Union[int, bool, str, Tuple[int, int]]]]
-]:
+def parse_maze_config():
     """
     Also die funktion macht die validierung der config werte,
     hier wird sich um die logik des Mazes auf Bit ebene gekuemmert.
@@ -124,26 +90,13 @@ def parse_maze_config(
     #  Initialisiere das Maze mit cells anstadt ints
     # maze[y][x] mit y=0..HEIGHT+1, x=0..WIDTH+1
     # Der Frame ist bei x=0, x=WIDTH+1, y=0, y=HEIGHT+1
-    width_val = config["WIDTH"]
-    height_val = config["HEIGHT"]
-    assert isinstance(width_val, int)
-    assert isinstance(height_val, int)
-    width = width_val
-    height = height_val
-    maze = [
-        [Cell(x, y) for x in range(width + 2)]
-        for y in range(height + 2)
-    ]
+    maze = [[Cell(x, y) for x in range(config['WIDTH'] + 2)] for y
+            in range(config['HEIGHT'] + 2)]
 
     # Markiere Frame-Zellen (Rand)
-    for y in range(height + 2):
-        for x in range(width + 2):
-            if (
-                x == 0
-                or x == width + 1
-                or y == 0
-                or y == height + 1
-            ):
+    for y in range(config['HEIGHT'] + 2):
+        for x in range(config['WIDTH'] + 2):
+            if x == 0 or x == config["WIDTH"] + 1 or y == 0 or y == config["HEIGHT"] + 1:
                 maze[y][x].mark_as_frame()
 
     return maze, config

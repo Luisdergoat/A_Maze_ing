@@ -3,15 +3,22 @@
 Docstring for algo
 """
 
+import random
+from typing import Dict, List, Sequence, Tuple, Union
+
 import mazeparser
 import visualize_maze
-import random
 
 
-steps = list()
+steps: List[Tuple[int, int]] = []
 
 
-def check_moves(maze, config, x, y) -> tuple:
+def check_moves(
+    maze: Sequence[Sequence[object]],
+    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    x: int,
+    y: int,
+) -> Dict[str, bool]:
     """
     Docstring for check_moves
     :param maze: Description
@@ -26,27 +33,36 @@ def check_moves(maze, config, x, y) -> tuple:
     # Check North: y-1
     if y > 1:  # y > 1 to avoid frame at y=0
         cell = maze[y - 1][x]
-        if not cell.is_visited() and not cell.frame:
+        if not cell.is_visited() and not cell.frame:  # type: ignore
             is_move_valid["N"] = True
     # Check South: y+1
-    if y < config["HEIGHT"]:
+    height_val = config["HEIGHT"]
+    assert isinstance(height_val, int)
+    if y < height_val:
         cell = maze[y + 1][x]
-        if not cell.is_visited() and not cell.frame:
+        if not cell.is_visited() and not cell.frame:  # type: ignore
             is_move_valid["S"] = True
     # Check East: x+1
-    if x < config["WIDTH"]:
+    width_val = config["WIDTH"]
+    assert isinstance(width_val, int)
+    if x < width_val:
         cell = maze[y][x + 1]
-        if not cell.is_visited() and not cell.frame:
+        if not cell.is_visited() and not cell.frame:  # type: ignore
             is_move_valid["E"] = True
     # Check West: x-1
     if x > 1:  # x > 1 to avoid frame at x=0
         cell = maze[y][x - 1]
-        if not cell.is_visited() and not cell.frame:
+        if not cell.is_visited() and not cell.frame:  # type: ignore
             is_move_valid["W"] = True
     return is_move_valid
 
 
-def do_silent_next_move(maze, valid_moves, x, y):
+def do_silent_next_move(
+    maze: Sequence[Sequence[object]],
+    valid_moves: Dict[str, bool],
+    x: int,
+    y: int,
+) -> Tuple[int, int]:
     """
     Docstring for do_next_move
     :param directions: Description
@@ -77,7 +93,12 @@ def do_silent_next_move(maze, valid_moves, x, y):
     return new_x, new_y
 
 
-def do_next_move(maze, valid_moves, x, y):
+def do_next_move(
+    maze: Sequence[Sequence[object]],
+    valid_moves: Dict[str, bool],
+    x: int,
+    y: int,
+) -> Tuple[int, int]:
     """
     Docstring for do_next_move
     :param directions: Description
@@ -106,12 +127,17 @@ def do_next_move(maze, valid_moves, x, y):
     if key == "W":
         remove_wall_between(maze, x, y, "W")
         new_x, new_y = x - 1, y
-    maze[new_y][new_x].mark_visited()
+    maze[new_y][new_x].mark_visited()  # type: ignore
     steps.append((new_x, new_y))
     return new_x, new_y
 
 
-def remove_wall_between(maze: list, x: int, y: int, direction: str) -> None:
+def remove_wall_between(
+    maze: Sequence[Sequence[object]],
+    x: int,
+    y: int,
+    direction: str,
+) -> None:
     """
     Docstring for change_cell_and_bit
     :param maze: Description
@@ -122,22 +148,35 @@ def remove_wall_between(maze: list, x: int, y: int, direction: str) -> None:
     S = 13  # 1101 - remove bottom wall
     W = 14  # 1110 - remove left wall
     if direction == "N":
-        maze[y][x].set_wall(N)      # Remove top wall of current cell
-        maze[y - 1][x].set_wall(S)  # Remove bottom wall of cell above
+        # Remove top wall of current cell
+        maze[y][x].set_wall(N)  # type: ignore
+        # Remove bottom wall of cell above
+        maze[y - 1][x].set_wall(S)  # type: ignore
     if direction == "E":
-        maze[y][x].set_wall(E)      # Remove right wall of current cell
-        maze[y][x + 1].set_wall(W)  # Remove left wall of cell to the right
+        # Remove right wall of current cell
+        maze[y][x].set_wall(E)  # type: ignore
+        # Remove left wall of cell to the right
+        maze[y][x + 1].set_wall(W)  # type: ignore
     if direction == "S":
-        maze[y][x].set_wall(S)      # Remove bottom wall of current cell
-        maze[y + 1][x].set_wall(N)  # Remove top wall of cell below
+        # Remove bottom wall of current cell
+        maze[y][x].set_wall(S)  # type: ignore
+        # Remove top wall of cell below
+        maze[y + 1][x].set_wall(N)  # type: ignore
     if direction == "W":
-        maze[y][x].set_wall(W)      # Remove left wall of current cell
-        maze[y][x - 1].set_wall(E)  # Remove right wall of cell to the left
+        # Remove left wall of current cell
+        maze[y][x].set_wall(W)  # type: ignore
+        # Remove right wall of cell to the left
+        maze[y][x - 1].set_wall(E)  # type: ignore
 
 
 # def make_backtrack():
 
-def generat_maze(maze, config, animate=False, delay=0.01):
+def generat_maze(
+    maze: Sequence[Sequence[object]],
+    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    animate: bool = False,
+    delay: float = 0.01,
+) -> None:
     """
     Docstring for generat_maze
     :param config: Description
@@ -145,55 +184,130 @@ def generat_maze(maze, config, animate=False, delay=0.01):
     :param delay: Verzögerung zwischen Frames (Sekunden)
     """
     import time
-    
+
     #  macht das maze und erstellt den weg halt ha
     # Config coordinates are without frame, so add +1 offset
-    entry_x, entry_y = config["ENTRY"]
-    exit_x, exit_y = config["EXIT"]
+    entry_tuple = config["ENTRY"]
+    exit_tuple = config["EXIT"]
+    assert isinstance(entry_tuple, tuple)
+    assert isinstance(exit_tuple, tuple)
+    entry_x, entry_y = entry_tuple
+    exit_x, exit_y = exit_tuple
     exit_x, exit_y = exit_x + 1, exit_y + 1  # Add frame
     x, y = entry_x + 1, entry_y + 1  # Add frame offset
-    maze[y][x].mark_visited()
-    maze[exit_x][exit_y].mark_visited()
+    maze[y][x].mark_visited()  # type: ignore
+    maze[exit_x][exit_y].mark_visited()  # type: ignore
     steps.append((x, y))
-    
+
     # Start Live-Visualisierung
     if animate:
-        visualize_maze.start_live_visualization(maze, config, current_pos=(x, y))
-    
+        visualize_maze.start_live_visualization(
+            maze,
+            config,
+            current_pos=(x, y),
+        )
+
+    # handle seeds
+    seed_val = config['SEED']
+    try:
+        seed_int = int(seed_val)  # type: ignore
+    except ValueError:
+        seed_int = int(random.random() * 1000000)
+    random.seed(seed_int)
+
     # sowas wie eine last cell muss gespeichert werden um zu wissen welche
     # beiden wände entfernt werden müssen.
-    exit_moves = check_moves(maze, config, exit_x, exit_y)  # open Exit Wall
-    exit_x, exit_y = do_silent_next_move(maze, exit_moves, exit_x, exit_y)
-    
+    exit_moves = check_moves(
+        maze,
+        config,
+        exit_x,
+        exit_y,
+    )  # open Exit Wall
+    exit_x, exit_y = do_silent_next_move(
+        maze,
+        exit_moves,
+        exit_x,
+        exit_y,
+    )
     move_count = 0
-    for i in range(999999999999999):
+    while True:
         valid_moves = check_moves(maze, config, x, y)
-        x, y = do_next_move(maze, valid_moves, x, y)
+        x, y = do_next_move(
+            maze,
+            valid_moves,
+            x,
+            y,
+        )
         move_count += 1
-        
+
         # Aktualisiere Live-Visualisierung für jeden Move
         if animate:
-            visualize_maze.update_live_visualization(maze, config, current_pos=(x, y))
+            visualize_maze.update_live_visualization(
+                maze,
+                config,
+                current_pos=(x, y),
+            )
             time.sleep(delay)
-        
-        # remove_wall_between(maze, last_cell, (x, y)) muss hier gemacht werden
+
+        # remove_wall_between(maze, last_cell, (x, y))
+        # muss hier gemacht werden
         if x == -1:
             if len(steps) > 0:
                 x, y = steps.pop()
             else:
                 break
-    
+
     # Stoppe Live-Visualisierung
     if animate:
         visualize_maze.stop_live_visualization()
 
 
+def generate_output_file(
+    maze: Sequence[Sequence[object]],
+    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+) -> None:
+    """generate the output_maze.txt"""
+    entry_tuple = config['ENTRY']
+    exit_tuple = config['EXIT']
+    assert isinstance(entry_tuple, tuple)
+    assert isinstance(exit_tuple, tuple)
+    entry_x, entry_y = entry_tuple
+    exit_x, exit_y = exit_tuple
+    output_file = str(config['OUTPUT_FILE'])
+    height_val = config['HEIGHT']
+    width_val = config['WIDTH']
+    assert isinstance(height_val, int)
+    assert isinstance(width_val, int)
+    with open(output_file, "w") as f:
+        for row in maze[1:height_val]:
+            for cell in row[1:width_val]:
+                f.write(f"{hex(cell.get_wall())[2:]}")  # type: ignore
+            f.write("\n")
+        f.write("\n")
+        f.write(f"{entry_x},{entry_x}\n")
+        f.write(f"{exit_x},{exit_x}\n")
+
+
 if __name__ == "__main__":
-    maze, config = mazeparser.parse_maze_config()
-    
-    # Mit Animation (extrem schnell): animate=True, delay=0.00000000001
-    # Ohne Animation (schnell): animate=False
-    generat_maze(maze, config, animate=True, delay=0.00000000001)
-    
-    # Finale Visualisierung mit allen Details
-    visualize_maze.visualize_cell_maze(maze, config, clear_screen=True)
+    result = mazeparser.parse_maze_config()
+    if result is not None:
+        maze, config = result
+
+        # Mit Animation (extrem schnell):
+        # animate=True, delay=0.00000000001
+        # Ohne Animation (schnell): animate=False
+        generat_maze(
+            maze,
+            config,
+            animate=False,
+            delay=0.00000000001,
+        )
+
+        # Finale Visualisierung mit allen Details
+        visualize_maze.visualize_cell_maze(
+            maze,
+            config,
+            clear_screen=True,
+        )
+
+        generate_output_file(maze, config)
