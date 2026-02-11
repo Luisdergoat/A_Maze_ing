@@ -11,11 +11,6 @@ from mazegen_algo import generat_maze
 from output_file import generate_output_file
 from solve_maze_algo import maze_solve, maze_visualization
 from pyfiglet import figlet_format
-from asciimatics.screen import Screen
-from asciimatics.effects import Matrix, Print
-from asciimatics.renderers import FigletText
-from asciimatics.scene import Scene
-from asciimatics.exceptions import ResizeScreenError
 
 
 def main():
