@@ -71,6 +71,7 @@ def main():
             os.system("clear")
             return
         else:
+            os.system("clear")
             print("Enter a valid number")
             continue
 
