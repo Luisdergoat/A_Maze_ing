@@ -24,6 +24,7 @@ def main():
             os.system("clear")
             print(option)
         except ValueError:
+            os.system("clear")
             print("Enter a valid number")
             continue
         if option == 1:
