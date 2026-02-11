@@ -56,9 +56,9 @@ $(VENV)/bin/activate:
 # Create requirements.txt if it doesn't exist
 requirements.txt:
 	@echo "$(BLUE)📝 Creating requirements.txt...$(RESET)"
-	@echo "rich>=13.0.0\npytest>=7.0.0" > requirements.txt
+	@echo "rich>=13.0.0\npytest>=7.0.0\nneovim>=0.3.1\npyfiglet>=0.8.post1\nasciimatics>=1.1.0" > requirements.txt
 	@echo "$(GREEN)✅ requirements.txt created!$(RESET)"
-
+	@echo "$(GREEN)✅ richui, pytest, neovim, and pyfiglet installed successfully!$(RESET)"
 # Create config.txt if it doesn't exist
 $(CONFIG):
 	@echo "$(YELLOW)⚠️  config.txt not found. Creating default...$(RESET)"
@@ -93,7 +93,7 @@ fclean: clean
 	@rm -rf $(VENV)
 	@rm -f requirements.txt
 	@echo "$(GREEN)✅ Full clean complete!$(RESET)"
-
+ 
 # Reinstall everything
 re: fclean all
 
@@ -114,11 +114,5 @@ help:
 	@echo "  make fclean     - Remove venv and all generated files"
 	@echo "  make re         - Full reinstall"
 	@echo ""
-
-# Activate virtual environment (for manual use)
-activate:
-	@echo "$(YELLOW)To activate virtual environment, run:$(RESET)"
-	@echo "$(GREEN)source $(VENV)/bin/activate$(RESET)"
-
 
 .PHONY: all install run clean fclean re help activate
