@@ -37,8 +37,7 @@ OUTPUT_FILE	= $(SRC_DIR)/output_file.py
 
 # ================================ TARGETS ================================= #
 
-all: install
-	@echo "$(GREEN)✅ Installation complete! Run 'make run' to start.$(RESET)"
+all: run
 
 # Install dependencies in virtual environment
 install: $(VENV)/bin/activate requirements.txt

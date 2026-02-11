@@ -40,14 +40,17 @@ class Cell:
     def unmark_need_to_solve(self):
         self.solve_need = False
 
-    def set_x(self, x: int) -> None:
-        self.x = x
+    def get_x(self) -> int:
+        return self.x
 
-    def set_y(self, y: int) -> None:
-        self.y = y
+    def get_y(self) -> int:
+        return self.y
 
     def set_wall(self, direction: int) -> None:
         self.wall = self.wall & direction
+
+    def set_wall_value(self, wall) -> None:
+        self.wall = wall
 
     def get_wall(self) -> int:
         return self.wall

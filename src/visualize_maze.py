@@ -328,6 +328,123 @@ def visualize_cell_maze(
     console.print(panel, justify="center")
 
 
+def visualize_cell_maze_different_color(
+    cell_maze: Sequence[Sequence[object]],
+    config: ConfigMapping,
+    clear_screen: bool = False,
+    show_config: bool = True,
+    show_table: bool = True,
+) -> None:
+    """
+    Visualisiert ein Maze aus Cell-Objekten.
+    Diese Funktion kann aus algo.py aufgerufen werden.
+    :param cell_maze: 2D-Array von Cell-Objekten
+    :param config: Config-Dictionary mit WIDTH, HEIGHT,
+        ENTRY, EXIT
+    :param clear_screen: Wenn True, wird der Bildschirm vorher gelöscht
+        (für Animation)
+    :param show_config: Zeige Config-Info
+    :param show_table: Zeige Bit-Tabelle
+    """
+    if not cell_maze or not config:
+        console.print("Fehler: Maze oder Config ist None")
+        return
+
+    # Clear screen for animation
+    if clear_screen:
+        console.clear()
+
+    # Use actual maze dimensions instead of config values
+    maze = convert_cells_to_maze_array(cell_maze)
+    if not maze:
+        console.print("Fehler: Konvertierung des Mazes fehlgeschlagen")
+        return
+
+    height = len(maze)
+    width = len(maze[0]) if height > 0 else 0
+
+    # Check if cell_maze has frame
+    has_frame = False
+    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
+        try:
+            if (
+                hasattr(cell_maze[0][0], "frame")
+                and cell_maze[0][0].frame
+            ):
+                has_frame = True
+        except (IndexError, AttributeError):
+            pass
+
+    # Adjust entry/exit coordinates if frame exists
+    # Config coordinates refer to maze without frame
+    entry, exit_pos = _get_entry_exit(config)
+    entry_x, entry_y = entry
+    exit_x, exit_y = exit_pos
+
+    if has_frame:
+        # Add 1 to account for frame border
+        entry_x += 1
+        entry_y += 1
+        exit_x += 1
+        exit_y += 1
+
+    # TODO: Hier können später die Wände basierend auf
+    # den Cell-Verbindungen gesetzt werden
+
+    # Zeige Config-Info
+    if show_config:
+        from rich.align import Align
+
+        config_panel = print_config_info(config)
+        console.print(Align.center(config_panel))
+        console.print()
+
+    # Zeige Bit-Tabelle
+    if show_table:
+        from rich.align import Align
+
+        table = print_maze_table(
+            maze,
+            width,
+            height,
+            entry_x,
+            entry_y,
+            exit_x,
+            exit_y,
+        )
+        console.print(Align.center(table))
+        console.print()
+    table = print_maze_table(
+        maze,
+        width,
+        height,
+        entry_x,
+        entry_y,
+        exit_x,
+        exit_y,
+    )
+    console.print(Align.center(table))
+    console.print()
+
+    # Zeige visuelles Maze
+    panel = change_maze_color(
+        maze,
+        width,
+        height,
+        entry_x,
+        entry_y,
+        exit_x,
+        exit_y,
+        cell_maze=cell_maze,
+        has_frame=has_frame,
+    )
+
+    if clear_screen:
+        console.clear()
+
+    console.print(panel, justify="center")
+
+
 def print_config_info(config: ConfigMapping) -> Table:
     """
     Zeigt die Config-Informationen mit Rich an.
@@ -538,9 +655,8 @@ def print_maze_visual_rich(
             elif is_frame:
                 line.append("███", style="red")
             elif is_solving:
-                line.append("███", style="bold blue")
-            elif is_visited:
-                line.append(" · ", style="dim cyan")
+                line.append(" ■ ", style="bold blue")
+
             else:
                 line.append("   ")
 
@@ -622,6 +738,239 @@ def print_maze_visual_rich(
             "Generation[/bold green]"
         ),
         border_style="green",
+        box=box.ROUNDED,
+        expand=False,
+    )
+
+    # Bit-Legende
+    legend = Table(
+        title="[bold yellow]Bit-Legende[/bold yellow]",
+        box=box.SIMPLE,
+        border_style="yellow",
+    )
+    legend.add_column("Bit", justify="center", style="cyan")
+    legend.add_column("Wert", justify="center", style="white")
+    legend.add_column("Position", style="green")
+    legend.add_column("Beispiel", style="magenta")
+
+    legend.add_row("3", "8", "Oben ↑", "1000")
+    legend.add_row("2", "4", "Rechts →", "0100")
+    legend.add_row("1", "2", "Unten ↓", "0010")
+    legend.add_row("0", "1", "Links ←", "0001")
+
+    console.print(legend)
+
+    # Zusätzliche Info
+    info_text = Text()
+    info_text.append(
+        "15 (1111) = alle Wände zu",
+        style="dim",
+    )
+    info_text.append("  |  ")
+    info_text.append(
+        "0 (0000) = alle Wände offen",
+        style="bold blue",
+    )
+    info_text.append("  |  ")
+    info_text.append(
+        "E",
+        style="bold green on black",
+    )
+    info_text.append(" = Entry  |  ")
+    info_text.append(
+        "X",
+        style="bold red on black",
+    )
+    info_text.append(" = Exit  |  ")
+    info_text.append("█", style="on red")
+    info_text.append(" = Frame")
+    console.print(Panel(info_text, border_style="blue"))
+
+
+def change_maze_color(
+    maze: Sequence[Sequence[int]],
+    width: int,
+    height: int,
+    entry_x: int,
+    entry_y: int,
+    exit_x: int,
+    exit_y: int,
+    cell_maze: Optional[Sequence[Sequence[object]]] = None,
+    has_frame: bool = False,
+    current_pos: Optional[Tuple[int, int]] = None,
+) -> Panel:
+    """
+    Zeigt das Maze visuell mit Rich und farbigen ASCII-Zeichen an.
+    Gibt ein Panel zurück für Live-Updates.
+
+    Bits: Oben=8, Rechts=4, Unten=2, Links=1
+    """
+    # Validate dimensions
+    if not maze or not maze[0]:
+        return Panel(
+            "Fehler: Maze ist leer",
+            title="Maze",
+            border_style="pink",
+        )
+
+    actual_height = len(maze)
+    actual_width = len(maze[0])
+
+    maze_text = Text()
+
+    # Top border
+    line = Text()
+    for x in range(actual_width):
+        cell = maze[0][x]
+        is_frame = False
+        if cell_maze:
+            try:
+                cell_obj = cell_maze[0][x]
+                if hasattr(cell_obj, "frame"):
+                    is_frame = cell_obj.frame
+            except (IndexError, AttributeError):
+                pass
+
+        color = "pink" if is_frame else "blue"
+
+        if x == 0:
+            line.append("┏", style=color)
+        else:
+            line.append("┳", style=color)
+
+        if cell & 8:
+            line.append("━━━", style=color)
+        else:
+            line.append("   ")
+
+    line.append("┓", style="bold grey")
+    maze_text.append_text(line)
+    maze_text.append("\n")
+
+    # Zeichne jede Zeile
+    for y in range(actual_height):
+        # Content line
+        line = Text()
+
+        for x in range(actual_width):
+            cell = maze[y][x]
+
+            # Check for frame
+            is_frame = False
+            is_visited = False
+            is_solving = False
+            if cell_maze:
+                try:
+                    cell_obj = cell_maze[y][x]
+                    if hasattr(cell_obj, "frame"):
+                        is_frame = cell_obj.frame
+                    if hasattr(cell_obj, "visited"):
+                        is_visited = cell_obj.visited
+                    if hasattr(cell_obj, "solve_need"):
+                        is_solving = cell_obj.solve_need
+                except (IndexError, AttributeError):
+                    pass
+
+            color = "pink" if is_frame else "bold grey"
+
+            # Left wall
+            if cell & 1:
+                line.append("┃", style=color)
+            else:
+                line.append(" ")
+
+            # Cell content
+            if current_pos and (x, y) == current_pos:
+                line.append(" ● ", style="bold red")
+            elif (x, y) == (entry_x, entry_y):
+                line.append(" E ", style="bold green")
+            elif (x, y) == (exit_x, exit_y):
+                line.append(" X ", style="bold red")
+            elif is_frame:
+                line.append("███", style="bold cyan")
+            elif is_solving:
+                line.append(" ■ ", style="bold grey")
+            else:
+                line.append("   ")
+
+        # Right wall
+        rightmost = maze[y][actual_width - 1]
+        is_frame_right = False
+        if cell_maze:
+            try:
+                cell_obj = cell_maze[y][actual_width - 1]
+                if hasattr(cell_obj, "frame"):
+                    is_frame_right = cell_obj.frame
+            except (IndexError, AttributeError):
+                pass
+
+        color_right = "pink" if is_frame_right else "bold grey"
+        if rightmost & 4:
+            line.append("┃", style=color_right)
+        else:
+            line.append(" ")
+
+        maze_text.append_text(line)
+        maze_text.append("\n")
+
+        # Bottom border line
+        line = Text()
+        for x in range(actual_width):
+            cell = maze[y][x]
+
+            is_frame = False
+            if cell_maze:
+                try:
+                    cell_obj = cell_maze[y][x]
+                    if hasattr(cell_obj, "frame"):
+                        is_frame = cell_obj.frame
+                except (IndexError, AttributeError):
+                    pass
+
+            color = "pink" if is_frame else "bold grey"
+
+            if x == 0:
+                if y == actual_height - 1:
+                    line.append("┗", style=color)
+                else:
+                    line.append("┣", style=color)
+            else:
+                if y == actual_height - 1:
+                    line.append("┻", style=color)
+                else:
+                    line.append("╋", style=color)
+
+            if cell & 2:
+                line.append("━━━", style=color)
+            else:
+                line.append("   ")
+
+        # Right edge
+        is_frame_right = False
+        if cell_maze:
+            try:
+                cell_obj = cell_maze[y][actual_width - 1]
+                if hasattr(cell_obj, "frame"):
+                    is_frame_right = cell_obj.frame
+            except (IndexError, AttributeError):
+                pass
+
+        color_right = "pink" if is_frame_right else "bold grey"
+        if y == actual_height - 1:
+            line.append("┛", style="bold grey")
+        else:
+            line.append("┫", style=color_right)
+
+        maze_text.append_text(line)
+        maze_text.append("\n")
+
+    return Panel(
+        maze_text,
+        title=(
+            "[bold green]Maze "
+            "Generation[/bold green]"
+        ),
+        border_style="red",
         box=box.ROUNDED,
         expand=False,
     )

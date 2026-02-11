@@ -19,10 +19,10 @@ def main():
         print("2: edit config")
         print("3: change colour (geht nicht)")
         print("4: exit")
+        print("5: exit with cleanup")
         try:
             option = int(input("Choose option: "))
-            os.system("clear")
-            print(option)
+            # os.system("clear")
         except ValueError:
             os.system("clear")
             print("Enter a valid number")
@@ -37,20 +37,21 @@ def main():
                 generat_maze(
                     maze,
                     config,
-                    animate=True,
-                    delay=0.000000001,
+                    animate=False,
+                    delay=0.00000001,
                 )
                 # Löse das Maze und markiere den Lösungsweg
                 solution = maze_solve(
                     maze,
                     config,
                 )
+                # os.system("clear")
                 maze_visualization(
                     maze,
                     config,
                     solution,
-                    animate=True,
-                    delay=0.1
+                    animate=False,
+                    delay=0.01
                 )
 
                 # Finale Visualisierung mit allen Details
@@ -63,13 +64,21 @@ def main():
                 # Ausgabe der maze.txt Datei
                 generate_output_file(maze, config)
         elif option == 2:
-            os.system("nano config.txt")
+            os.system("nvim config.txt")
             continue
         elif option == 3:
-            os.system("clear")
+            vizualizer.visualize_cell_maze_different_color(
+                    maze,
+                    config,
+                    clear_screen=True,
+                )
             continue
         elif option == 4:
             os.system("clear")
+            return
+        elif option == 5:
+            os.system("clear")
+            os.system("make fclean")
             return
         else:
             os.system("clear")

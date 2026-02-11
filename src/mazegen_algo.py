@@ -56,6 +56,50 @@ def check_moves(
     return is_move_valid
 
 
+def check_walls(
+    maze: Sequence[Sequence[object]],
+    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    x: int,
+    y: int,
+) -> Dict[str, bool]:
+    """
+    Docstring for check_moves
+    :param maze: Description
+    :param cell: Description
+    """
+    is_move_valid = {
+        "N": False,
+        "E": False,
+        "S": False,
+        "W": False
+    }
+    # Check North: y-1
+    if y > 1:  # y > 1 to avoid frame at y=0
+        cell = maze[y - 1][x]
+        if not cell.frame:  # type: ignore
+            is_move_valid["N"] = True
+    # Check South: y+1
+    height_val = config["HEIGHT"]
+    assert isinstance(height_val, int)
+    if y < height_val:
+        cell = maze[y + 1][x]
+        if not cell.frame:  # type: ignore
+            is_move_valid["S"] = True
+    # Check East: x+1
+    width_val = config["WIDTH"]
+    assert isinstance(width_val, int)
+    if x < width_val:
+        cell = maze[y][x + 1]
+        if not cell.frame:  # type: ignore
+            is_move_valid["E"] = True
+    # Check West: x-1
+    if x > 1:  # x > 1 to avoid frame at x=0
+        cell = maze[y][x - 1]
+        if not cell.frame:  # type: ignore
+            is_move_valid["W"] = True
+    return is_move_valid
+
+
 def do_silent_next_move(
     maze: Sequence[Sequence[object]],
     valid_moves: Dict[str, bool],
@@ -102,7 +146,6 @@ def do_next_move(
     Docstring for do_next_move
     :param directions: Description
     """
-    print("next_move", x, y)
     true_count = 0
     key = None
     for key in valid_moves:
@@ -162,7 +205,7 @@ def remove_wall_between(
 
 def add_42_pattern(maze, config):
     """
-    Docstring for add_42_patter
+    Docstring for add_42_pattern
     :param maze: Description
     """
     height = config['HEIGHT'] + 1
@@ -192,6 +235,25 @@ def add_42_pattern(maze, config):
     maze[mid_x - 2][mid_y + 3].mark_as_frame()
     maze[mid_x - 2][mid_y + 2].mark_as_frame()
     maze[mid_x - 2][mid_y + 1].mark_as_frame()
+
+
+def remove_extra_walls(maze, config) -> None:
+    """
+    Docstring for remove_extra_walls
+    :param maze: Description
+    :param config: Description
+    """
+    for row in maze:
+        for cell in row:
+            average_size = int(config["HEIGHT"] + config["WIDTH"] / 2)
+            rand = random.randint(1, average_size)
+            if (cell.get_x() % rand == 0 or cell.get_y() % rand == 0):
+                temp = cell.get_wall()
+                moves = check_walls(maze, config, cell.get_x(), cell.get_y())
+                do_silent_next_move(maze, moves, cell.get_x(), cell.get_y())
+                wall_value = cell.get_wall()
+                if wall_value == 0:
+                    cell.set_wall(temp)
 
 
 def generat_maze(
@@ -276,14 +338,17 @@ def generat_maze(
 
         # remove_wall_between(maze, last_cell, (x, y))
         # muss hier gemacht werden
+        # try:
         perfect_maze = config["PERFECT"]
-        if perfect_maze is False:
-            pass
+        # except ValueError:
+        #     pass
         if x == -1:
             if len(steps) > 0:
                 x, y = steps.pop()
             else:
                 break
+    if perfect_maze == "False":
+        remove_extra_walls(maze, config)
 
     # Stoppe Live-Visualisierung
     if animate:

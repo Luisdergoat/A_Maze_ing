@@ -69,7 +69,6 @@ def maze_solve(maze, config):
 
         # Exit erreicht?
         if x == exit_x and y == exit_y:
-            print(f"Found Exit: length {len(current_path)}")
             return current_path
 
         # Finde alle möglichen Moves
@@ -79,7 +78,6 @@ def maze_solve(maze, config):
         for direction, new_x, new_y in possible_moves:
             stack.append((new_x, new_y, current_path))
 
-    print(" No solution found!")
     return None
 
 
