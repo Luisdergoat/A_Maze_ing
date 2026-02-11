@@ -16,7 +16,7 @@ def main():
         result = mazeparser.parse_maze_config()
         print("Choose on of the options")
         print("1: generate Maze")
-        print("2: ka")
+        print("2: edit config")
         print("3: change colour (geht nicht)")
         print("4: exit")
         try:
@@ -37,7 +37,7 @@ def main():
                 generat_maze(
                     maze,
                     config,
-                    animate=False,
+                    animate=True,
                     delay=0.000000001,
                 )
                 # Löse das Maze und markiere den Lösungsweg
@@ -49,8 +49,8 @@ def main():
                     maze,
                     config,
                     solution,
-                    animate=False,
-                    delay=0.00000001
+                    animate=True,
+                    delay=0.1
                 )
 
                 # Finale Visualisierung mit allen Details
@@ -63,7 +63,7 @@ def main():
                 # Ausgabe der maze.txt Datei
                 generate_output_file(maze, config)
         elif option == 2:
-            os.system("clear")
+            os.system("nano config.txt")
             continue
         elif option == 3:
             os.system("clear")

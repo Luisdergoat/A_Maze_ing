@@ -239,7 +239,8 @@ def generat_maze(
     random.seed(seed_int)
 
     # add 42 pattern
-    add_42_pattern(maze, config)
+    if config['42PATTERN'] is True:
+        add_42_pattern(maze, config)
 
     exit_moves = check_moves(
         maze,

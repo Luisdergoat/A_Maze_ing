@@ -46,6 +46,7 @@ def read_out_config(
             "EXIT",
             "OUTPUT_FILE",
             "PERFECT",
+            "42PATTERN",
             "SEED",
         ]
 
