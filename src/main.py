@@ -3,10 +3,11 @@ Docstring for main
 """
 
 
-from mazegen_algo import generat_maze, generate_output_file
 import mazeparser
-from solve_maze_algo import solve_maze_with_visualization
 import visualize_maze as vizualizer
+from mazegen_algo import generat_maze
+from output_file import generate_output_file
+from solve_maze_algo import maze_solve, maze_visualization
 
 
 def main():
@@ -20,15 +21,20 @@ def main():
         generat_maze(
             maze,
             config,
-            animate=True,
+            animate=False,
             delay=0.000000001,
         )
         # Löse das Maze und markiere den Lösungsweg
-        solution = solve_maze_with_visualization(
+        solution = maze_solve(
             maze,
             config,
-            animate=True,
-            delay=0.1,
+        )
+        maze_visualization(
+            maze,
+            config,
+            solution,
+            animate=False,
+            delay=0.00000001
         )
 
         # Finale Visualisierung mit allen Details

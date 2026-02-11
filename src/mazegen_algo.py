@@ -6,7 +6,6 @@ Docstring for algo
 import random
 from typing import Dict, List, Sequence, Tuple, Union
 
-import mazeparser
 import visualize_maze
 
 
@@ -161,7 +160,39 @@ def remove_wall_between(
         maze[y][x - 1].set_wall(E)  # type: ignore
 
 
-# def make_backtrack():
+def add_42_pattern(maze, config):
+    """
+    Docstring for add_42_patter
+    :param maze: Description
+    """
+    height = config['HEIGHT'] + 1
+    width = config['WIDTH'] + 1
+    mid_x = int(height / 2)
+    mid_y = int(width / 2)
+    if height < 8 or width < 10:
+        print("Maze is to small for 42 pattern")
+        return
+    # mark 4 as frame
+    maze[mid_x][mid_y - 1].mark_as_frame()
+    maze[mid_x + 1][mid_y - 1].mark_as_frame()
+    maze[mid_x + 2][mid_y - 1].mark_as_frame()
+    maze[mid_x][mid_y - 2].mark_as_frame()
+    maze[mid_x][mid_y - 3].mark_as_frame()
+    maze[mid_x - 1][mid_y - 3].mark_as_frame()
+    maze[mid_x - 2][mid_y - 3].mark_as_frame()
+    # mark 2 as frame
+    maze[mid_x][mid_y + 1].mark_as_frame()
+    maze[mid_x + 1][mid_y + 1].mark_as_frame()
+    maze[mid_x + 2][mid_y + 1].mark_as_frame()
+    maze[mid_x + 2][mid_y + 2].mark_as_frame()
+    maze[mid_x + 2][mid_y + 3].mark_as_frame()
+    maze[mid_x][mid_y + 2].mark_as_frame()
+    maze[mid_x][mid_y + 3].mark_as_frame()
+    maze[mid_x - 1][mid_y + 3].mark_as_frame()
+    maze[mid_x - 2][mid_y + 3].mark_as_frame()
+    maze[mid_x - 2][mid_y + 2].mark_as_frame()
+    maze[mid_x - 2][mid_y + 1].mark_as_frame()
+
 
 def generat_maze(
     maze: Sequence[Sequence[object]],
@@ -207,8 +238,9 @@ def generat_maze(
         seed_int = random.randint(-2147483648, 2147483647)
     random.seed(seed_int)
 
-    # sowas wie eine last cell muss gespeichert werden um zu wissen welche
-    # beiden wände entfernt werden müssen.
+    # add 42 pattern
+    add_42_pattern(maze, config)
+
     exit_moves = check_moves(
         maze,
         config,
@@ -244,6 +276,8 @@ def generat_maze(
         # remove_wall_between(maze, last_cell, (x, y))
         # muss hier gemacht werden
         perfect_maze = config["PERFECT"]
+        if perfect_maze is False:
+            pass
         if x == -1:
             if len(steps) > 0:
                 x, y = steps.pop()
@@ -253,30 +287,3 @@ def generat_maze(
     # Stoppe Live-Visualisierung
     if animate:
         visualize_maze.stop_live_visualization()
-
-
-def generate_output_file(
-    maze: Sequence[Sequence[object]],
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
-) -> None:
-    """generate the output_maze.txt"""
-    entry_tuple = config['ENTRY']
-    exit_tuple = config['EXIT']
-    assert isinstance(entry_tuple, tuple)
-    assert isinstance(exit_tuple, tuple)
-    entry_x, entry_y = entry_tuple
-    exit_x, exit_y = exit_tuple
-    output_file = str(config['OUTPUT_FILE'])
-    height_val = config['HEIGHT']
-    width_val = config['WIDTH']
-    assert isinstance(height_val, int)
-    assert isinstance(width_val, int)
-    with open(output_file, "w") as f:
-        for row in maze[1:height_val + 1]:
-            for cell in row[1:width_val + 1]:
-                f.write(f"{hex(cell.get_wall())[2:]}")  # type: ignore
-            f.write("\n")
-        f.write("\n")
-        f.write(f"{entry_x},{entry_y}\n")
-        f.write(f"{exit_x},{exit_y}\n")
-

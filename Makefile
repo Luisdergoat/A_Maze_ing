@@ -25,7 +25,7 @@ ACTIVATE	= source $(VENV)/bin/activate
 
 SRC_DIR		= src
 CONFIG		= config.txt
-OUTPUT		= output_maze.txt
+OUTPUT		= maze.txt
 MAZE_TXT	= $(SRC_DIR)/maze.txt
 
 # Python files
@@ -144,7 +144,7 @@ freeze: $(VENV)/bin/activate
 # Show help
 help:
 	@echo "$(BLUE)╔══════════════════════════════════════════════════════════╗$(RESET)"
-	@echo "$(BLUE)║              A_Maze_ing - Makefile Commands             ║$(RESET)"
+	@echo "$(BLUE)║              A_Maze_ing - Makefile Commands              ║$(RESET)"
 	@echo "$(BLUE)╚══════════════════════════════════════════════════════════╝$(RESET)"
 	@echo ""
 	@echo "$(GREEN)Installation:$(RESET)"
