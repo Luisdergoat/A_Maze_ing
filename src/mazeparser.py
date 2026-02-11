@@ -84,13 +84,13 @@ def read_out_config(
             raise ValueError("EXIT must be a tuple of two integers")
         entry_x, entry_y = int(entry_tuple[0]), int(entry_tuple[1])
         exit_x, exit_y = int(exit_tuple[0]), int(exit_tuple[1])
-        if not 0 < entry_x < width:
+        if not -1 < entry_x < width:
             raise ValueError("The entry is out of bounds.")
-        if not 0 < entry_y < height:
+        if not -1 < entry_y < height:
             raise ValueError("The entry is out of bounds.")
-        if not 0 < exit_x < width:
+        if not -1 < exit_x < width:
             raise ValueError("The exit is out of bounds.")
-        if not 0 < exit_y < height:
+        if not -1 < exit_y < height:
             raise ValueError("The exit is out of bounds.")
         if config['ENTRY'] == config['EXIT']:
             raise ValueError("The entry and exit points must be different.")

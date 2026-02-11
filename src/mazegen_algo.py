@@ -219,7 +219,7 @@ def generat_maze(
     exit_x, exit_y = exit_x + 1, exit_y + 1  # Add frame
     x, y = entry_x + 1, entry_y + 1  # Add frame offset
     maze[y][x].mark_visited()  # type: ignore
-    maze[exit_x][exit_y].mark_visited()  # type: ignore
+    maze[exit_y][exit_x].mark_visited()  # type: ignore
     steps.append((x, y))
 
     # Start Live-Visualisierung
