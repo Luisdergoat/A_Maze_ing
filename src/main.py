@@ -9,15 +9,15 @@ import mazeparser
 import visualize_maze as vizualizer
 from mazegen_algo import generat_maze
 from output_file import generate_output_file
-from solve_maze_algo import maze_solve, maze_visualization
+from solve_maze_algo import maze_solve, maze_visualization, different_color
 from pyfiglet import figlet_format
 
 
 def main():
-    os.system("clear")  # mach fuer die animation ein pre clear, damit cleaner ist
+    os.system("clear")  # mach fuer die animation ein pre clear, damit cleaner
     play_intro()  # Optional: Intro Animation fuer den WoW Effect in der eval
     os.system("clear")
-    counter = 0
+    color = "default"
     while True:
         result = mazeparser.parse_maze_config()
         print("Choose on of the options")
@@ -34,58 +34,109 @@ def main():
             print("Enter a valid number")
             continue
         if option == 1:
-            counter += 1
+
             if result is not None:
-                maze, config = result
+                if color == "default":
+                    maze, config = result
 
-                # Mit Animation (extrem schnell):
-                # animate=True, delay=0.00000000001
-                # Ohne Animation (schnell): animate=False
-                generat_maze(
+                    # Mit Animation (extrem schnell):
+                    # animate=True, delay=0.00000000001
+                    # Ohne Animation (schnell): animate=False
+                    generat_maze(
+                        maze,
+                        config,
+                        animate=True,
+                        delay=0.00000001,
+                        color=color,
+                    )
+                    # Löse das Maze und markiere den Lösungsweg
+                    solution = maze_solve(
+                        maze,
+                        config,
+                    )
+                    # os.system("clear")
+                    maze_visualization(
+                        maze,
+                        config,
+                        solution,
+                        animate=True,
+                        delay=0.01,
+                    )
+
+                    # Finale Visualisierung mit allen Details
+                    vizualizer.visualize_cell_maze(
+                        maze,
+                        config,
+                        clear_screen=True,
+                    )
+
+                elif color == "changed":
+                    maze, config = result
+
+                    # Mit Animation (extrem schnell):
+                    # animate=True, delay=0.00000000001
+                    # Ohne Animation (schnell): animate=False
+                    generat_maze(
+                        maze,
+                        config,
+                        animate=True,
+                        delay=0.00000001,
+                        color=color,
+                    )
+                    # Löse das Maze und markiere den Lösungsweg
+                    solution = maze_solve(
+                        maze,
+                        config,
+                    )
+                    # os.system("clear")
+                    different_color(
+                        maze,
+                        config,
+                        solution,
+                        animate=True,
+                        delay=0.01,
+                    )
+
+                    # Finale Visualisierung mit allen Details
+                    vizualizer.visualize_cell_maze_different_color(
+                        maze,
+                        config,
+                        clear_screen=True,
+                    )
+
+                # Ausgabe der maze.txt Datei
+                generate_output_file(maze, config)
+
+        elif option == 2:
+            os.system("nvim config.txt")
+            continue
+        elif option == 3:
+
+            if color == "default":
+                color = "changed"
+            elif color == "changed":
+                color = "default"
+
+            if maze is not None and color == "changed":
+                vizualizer.visualize_cell_maze_different_color(
                     maze,
                     config,
-                    animate=True,
-                    delay=0.00000001,
-                )
-                # Löse das Maze und markiere den Lösungsweg
-                solution = maze_solve(
-                    maze,
-                    config,
-                )
-                # os.system("clear")
-                maze_visualization(
-                    maze,
-                    config,
-                    solution,
-                    animate=True,
-                    delay=0.01
+                    clear_screen=True,
                 )
 
-                # Finale Visualisierung mit allen Details
+            elif maze is not None and color == "default":
                 vizualizer.visualize_cell_maze(
                     maze,
                     config,
                     clear_screen=True,
                 )
 
-                # Ausgabe der maze.txt Datei
-                generate_output_file(maze, config)
-        elif option == 2:
-            os.system("nvim config.txt")
-            continue
-        elif option == 3:
-            if counter > 0:
-                vizualizer.visualize_cell_maze_different_color(
-                    maze,
-                    config,
-                    clear_screen=True,
-                )
             else:
                 os.system("clear")
                 print(
                     figlet_format(
-                        "Generate a maze first to change the color"
-                        , font="big"
+                        "Generate a maze first to change the color",
+                        font="big"
                         )
                     )
             continue

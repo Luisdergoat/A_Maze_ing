@@ -263,6 +263,7 @@ def generat_maze(
     config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
     animate: bool = False,
     delay: float = 0.01,
+    color: str = "default",
 ) -> None:
     """
     Docstring for generat_maze
@@ -287,8 +288,14 @@ def generat_maze(
     steps.append((x, y))
 
     # Start Live-Visualisierung
-    if animate:
+    if animate and color == "default":
         visualize_maze.start_live_visualization(
+            maze,
+            config,
+            current_pos=(x, y),
+        )
+    elif animate and color == "changed":
+        visualize_maze.start_live_visualization_different_color(
             maze,
             config,
             current_pos=(x, y),
@@ -331,11 +338,18 @@ def generat_maze(
 
         # Aktualisiere Live-Visualisierung für jeden Move
         if animate:
-            visualize_maze.update_live_visualization(
-                maze,
-                config,
-                current_pos=(x, y),
-            )
+            if color == "default":
+                visualize_maze.update_live_visualization(
+                    maze,
+                    config,
+                    current_pos=(x, y),
+                )
+            elif color == "changed":
+                visualize_maze.update_live_visualization_different_color(
+                    maze,
+                    config,
+                    current_pos=(x, y),
+                )
             time.sleep(delay)
 
         # remove_wall_between(maze, last_cell, (x, y))

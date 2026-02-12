@@ -104,6 +104,82 @@ def start_live_visualization(
     return _live_display
 
 
+def start_live_visualization_different_color(
+    cell_maze: Sequence[Sequence[object]],
+    config: ConfigMapping,
+    current_pos: Optional[Tuple[int, int]] = None,
+) -> Optional[Live]:
+    """Startet Live-Visualisierung für Animation"""
+    global _live_display
+
+    maze = convert_cells_to_maze_array(cell_maze)
+    if not maze:
+        return None
+
+    height = len(maze)
+    width = len(maze[0]) if height > 0 else 0
+
+    has_frame = False
+    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
+        try:
+            if (
+                hasattr(cell_maze[0][0], "frame")
+                and cell_maze[0][0].frame
+            ):
+                has_frame = True
+        except (IndexError, AttributeError):
+            pass
+
+    entry, exit_pos = _get_entry_exit(config)
+    entry_x, entry_y = entry
+    exit_x, exit_y = exit_pos
+
+    if has_frame:
+        entry_x += 1
+        entry_y += 1
+        exit_x += 1
+        exit_y += 1
+
+    panel = change_maze_color(
+        maze,
+        width,
+        height,
+        entry_x,
+        entry_y,
+        exit_x,
+        exit_y,
+        cell_maze=cell_maze,
+        has_frame=has_frame,
+        current_pos=current_pos,
+    )
+
+    # Erstelle eine zentierte Version des Panels
+    from rich.align import Align
+
+    centered_panel = Align.center(panel)
+
+    _live_display = Live(
+        centered_panel,
+        console=console,
+        refresh_per_second=120,
+    )
+    _live_display.start()
+    return _live_display
+
+    # Erstelle eine zentierte Version des Panels
+    from rich.align import Align
+
+    centered_panel = Align.center(panel)
+
+    _live_display = Live(
+        centered_panel,
+        console=console,
+        refresh_per_second=120,
+    )
+    _live_display.start()
+    return _live_display
+
+
 def update_live_visualization(
     cell_maze: Sequence[Sequence[object]],
     config: ConfigMapping,
@@ -168,6 +244,63 @@ def stop_live_visualization() -> None:
     if _live_display is not None:
         _live_display.stop()
         _live_display = None
+
+
+def update_live_visualization_different_color(
+    cell_maze: Sequence[Sequence[object]],
+    config: ConfigMapping,
+    current_pos: Optional[Tuple[int, int]] = None,
+) -> None:
+    """Aktualisiert Live-Visualisierung"""
+
+    if _live_display is None:
+        return
+
+    maze = convert_cells_to_maze_array(cell_maze)
+    if not maze:
+        return
+
+    height = len(maze)
+    width = len(maze[0]) if height > 0 else 0
+
+    has_frame = False
+    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
+        try:
+            if (
+                hasattr(cell_maze[0][0], "frame")
+                and cell_maze[0][0].frame
+            ):
+                has_frame = True
+        except (IndexError, AttributeError):
+            pass
+
+    entry, exit_pos = _get_entry_exit(config)
+    entry_x, entry_y = entry
+    exit_x, exit_y = exit_pos
+
+    if has_frame:
+        entry_x += 1
+        entry_y += 1
+        exit_x += 1
+        exit_y += 1
+
+    panel = change_maze_color(
+        maze,
+        width,
+        height,
+        entry_x,
+        entry_y,
+        exit_x,
+        exit_y,
+        cell_maze=cell_maze,
+        has_frame=has_frame,
+        current_pos=current_pos,
+    )
+
+    from rich.align import Align
+
+    centered_panel = Align.center(panel)
+    _live_display.update(centered_panel)
 
 
 def convert_cells_to_maze_array(
@@ -597,7 +730,7 @@ def print_maze_visual_rich(
             except (IndexError, AttributeError):
                 pass
 
-        color = "red" if is_frame else "white"
+        color = "white" if is_frame else "white"
 
         if x == 0:
             line.append("┏", style=color)
@@ -609,7 +742,7 @@ def print_maze_visual_rich(
         else:
             line.append("   ")
 
-    line.append("┓", style="red")
+    line.append("┓", style="white")
     maze_text.append_text(line)
     maze_text.append("\n")
 
@@ -623,7 +756,6 @@ def print_maze_visual_rich(
 
             # Check for frame
             is_frame = False
-            is_visited = False
             is_solving = False
             if cell_maze:
                 try:
@@ -631,13 +763,13 @@ def print_maze_visual_rich(
                     if hasattr(cell_obj, "frame"):
                         is_frame = cell_obj.frame
                     if hasattr(cell_obj, "visited"):
-                        is_visited = cell_obj.visited
+                        pass
                     if hasattr(cell_obj, "solve_need"):
                         is_solving = cell_obj.solve_need
                 except (IndexError, AttributeError):
                     pass
 
-            color = "red" if is_frame else "white"
+            color = "white" if is_frame else "white"
 
             # Left wall
             if cell & 1:
@@ -653,7 +785,7 @@ def print_maze_visual_rich(
             elif (x, y) == (exit_x, exit_y):
                 line.append(" X ", style="bold red")
             elif is_frame:
-                line.append("███", style="red")
+                line.append("███", style="bold red")
             elif is_solving:
                 line.append(" ■ ", style="bold blue")
 
@@ -671,7 +803,7 @@ def print_maze_visual_rich(
             except (IndexError, AttributeError):
                 pass
 
-        color_right = "red" if is_frame_right else "white"
+        color_right = "white" if is_frame_right else "white"
         if rightmost & 4:
             line.append("┃", style=color_right)
         else:
@@ -694,11 +826,11 @@ def print_maze_visual_rich(
                 except (IndexError, AttributeError):
                     pass
 
-            color = "red" if is_frame else "white"
+            color = "white" if is_frame else "white"
 
             if x == 0:
                 if y == actual_height - 1:
-                    line.append("└", style=color)
+                    line.append("┗", style=color)
                 else:
                     line.append("┣", style=color)
             else:
@@ -722,9 +854,9 @@ def print_maze_visual_rich(
             except (IndexError, AttributeError):
                 pass
 
-        color_right = "red" if is_frame_right else "white"
+        color_right = "white" if is_frame_right else "white"
         if y == actual_height - 1:
-            line.append("┛", style="red")
+            line.append("┛", style="white")
         else:
             line.append("┫", style=color_right)
 
@@ -857,7 +989,6 @@ def change_maze_color(
 
             # Check for frame
             is_frame = False
-            is_visited = False
             is_solving = False
             if cell_maze:
                 try:
@@ -865,7 +996,7 @@ def change_maze_color(
                     if hasattr(cell_obj, "frame"):
                         is_frame = cell_obj.frame
                     if hasattr(cell_obj, "visited"):
-                        is_visited = cell_obj.visited
+                        pass
                     if hasattr(cell_obj, "solve_need"):
                         is_solving = cell_obj.solve_need
                 except (IndexError, AttributeError):
@@ -889,7 +1020,7 @@ def change_maze_color(
             elif is_frame:
                 line.append("███", style="bold cyan")
             elif is_solving:
-                line.append(" ■ ", style="bold grey")
+                line.append(" ■ ", style="bold blue")
             else:
                 line.append("   ")
 

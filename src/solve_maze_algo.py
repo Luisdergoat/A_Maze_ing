@@ -2,12 +2,7 @@
 Docstring for clearmazealgo
 """
 
-import visualize_maze
-
-
-###########################################################################
-################ muss alles in clearmazealgo rein #########################
-###########################################################################
+import visualize_maze as vis
 
 
 def check_valid_moves(maze, x, y, visited):
@@ -95,18 +90,54 @@ def maze_visualization(
 
     if solution_path:
         if animate:
-            visualize_maze.start_live_visualization(maze, config)
+            vis.start_live_visualization(maze, config)
 
         # Markiere den finalen Lösungsweg
         for x, y in solution_path:
             maze[y][x].mark_need_to_solve()  # type: ignore
 
             if animate:
-                visualize_maze.update_live_visualization(maze, config)
+                vis.update_live_visualization(maze, config)
                 time.sleep(delay)
 
         if animate:
-            visualize_maze.stop_live_visualization()
+            vis.stop_live_visualization()
+
+        print(f"Pfadlänge: {len(solution_path)}")
+        print(f"Start: {solution_path[0]}")
+        print(f"Ende: {solution_path[-1]}")
+
+        return solution_path
+
+    return None
+
+
+def different_color(
+    maze,
+    config,
+    solution_path,
+    animate: bool = True,
+    delay: float = 0.01,
+):
+    """
+    Löst Maze und markiert den Lösungsweg
+    """
+    import time
+
+    if solution_path:
+        if animate:
+            vis.start_live_visualization_different_color(maze, config)
+
+        # Markiere den finalen Lösungsweg
+        for x, y in solution_path:
+            maze[y][x].mark_need_to_solve()  # type: ignore
+
+            if animate:
+                vis.update_live_visualization_different_color(maze, config)
+                time.sleep(delay)
+
+        if animate:
+            vis.stop_live_visualization()
 
         print(f"Pfadlänge: {len(solution_path)}")
         print(f"Start: {solution_path[0]}")
