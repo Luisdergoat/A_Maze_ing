@@ -73,6 +73,8 @@ def check_walls(
         "S": False,
         "W": False
     }
+    if maze[y][x].frame is True:
+        return is_move_valid
     # Check North: y-1
     if y > 1:  # y > 1 to avoid frame at y=0
         cell = maze[y - 1][x]
