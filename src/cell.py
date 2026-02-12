@@ -3,18 +3,20 @@
 Docstring for cell
 """
 
+from __future__ import annotations
+
 
 class Cell:
     """
     Class representing a cell in the maze.
     """
     def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
-        self.wall = 15
-        self.visited = False
-        self.frame = False
-        self.solve_need = False
+        self.x: int = x
+        self.y: int = y
+        self.wall: int = 15
+        self.visited: bool = False
+        self.frame: bool = False
+        self.solve_need: bool = False
 
     def __repr__(self) -> str:
         return (
@@ -34,10 +36,10 @@ class Cell:
     def is_visited(self) -> bool:
         return self.visited
 
-    def mark_need_to_solve(self):
+    def mark_need_to_solve(self) -> None:
         self.solve_need = True
 
-    def unmark_need_to_solve(self):
+    def unmark_need_to_solve(self) -> None:
         self.solve_need = False
 
     def get_x(self) -> int:
@@ -49,7 +51,7 @@ class Cell:
     def set_wall(self, direction: int) -> None:
         self.wall = self.wall & direction
 
-    def set_wall_value(self, wall) -> None:
+    def set_wall_value(self, wall: int) -> None:
         self.wall = wall
 
     def get_wall(self) -> int:

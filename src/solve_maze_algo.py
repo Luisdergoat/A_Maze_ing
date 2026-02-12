@@ -2,15 +2,29 @@
 Docstring for clearmazealgo
 """
 
+from __future__ import annotations
+
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+
+from cell import Cell
 import visualize_maze as vis
 
+ConfigValue = Union[int, bool, str, Tuple[int, int]]
+Config = Dict[str, ConfigValue]
+Maze = Sequence[Sequence[Cell]]
 
-def check_valid_moves(maze, x, y, visited):
+
+def check_valid_moves(
+    maze: Maze,
+    x: int,
+    y: int,
+    visited: Set[Tuple[int, int]],
+) -> List[Tuple[str, int, int]]:
     """
     Findet alle möglichen Bewegungen von aktueller Position.
     Nutzt Bit-Masken statt exakte Werte!
     """
-    moves = []
+    moves: List[Tuple[str, int, int]] = []
     wall = maze[y][x].get_wall()  # Oder .wall je nach Implementierung
 
     # Check Norden (Bit 3 = 0 → offen)
@@ -36,7 +50,10 @@ def check_valid_moves(maze, x, y, visited):
     return moves
 
 
-def maze_solve(maze, config):
+def maze_solve(
+    maze: Maze,
+    config: Config,
+) -> Optional[List[Tuple[int, int]]]:
     # Entry und Exit holen (mit Frame-Offset)
     entry_tuple = config["ENTRY"]
     exit_tuple = config["EXIT"]
@@ -45,14 +62,13 @@ def maze_solve(maze, config):
 
     start_x, start_y = entry_tuple[0] + 1, entry_tuple[1] + 1  # Frame offset
     exit_x, exit_y = exit_tuple[0] + 1, exit_tuple[1] + 1
-    stack = [(start_x, start_y, [])]  # (x, y, path)
-    visited = set()
+    stack: List[Tuple[int, int, List[Tuple[int, int]]]] = [
+        (start_x, start_y, [])
+    ]
+    visited: Set[Tuple[int, int]] = set()
 
     while stack:
-        try:
-            x, y, path = stack.pop()
-        except ValueError:
-            continue
+        x, y, path = stack.pop()
 
         # Bereits besucht? Skip
         if (x, y) in visited:
@@ -70,19 +86,19 @@ def maze_solve(maze, config):
         possible_moves = check_valid_moves(maze, x, y, visited)
 
         # Füge alle Moves zum Stack hinzu
-        for direction, new_x, new_y in possible_moves:
+        for _direction, new_x, new_y in possible_moves:
             stack.append((new_x, new_y, current_path))
 
     return None
 
 
 def maze_visualization(
-    maze,
-    config,
-    solution_path,
+    maze: Maze,
+    config: Config,
+    solution_path: Optional[Sequence[Tuple[int, int]]],
     animate: bool = True,
     delay: float = 0.01,
-):
+) -> Optional[Sequence[Tuple[int, int]]]:
     """
     Löst Maze und markiert den Lösungsweg
     """
@@ -94,7 +110,7 @@ def maze_visualization(
 
         # Markiere den finalen Lösungsweg
         for x, y in solution_path:
-            maze[y][x].mark_need_to_solve()  # type: ignore
+            maze[y][x].mark_need_to_solve()
 
             if animate:
                 vis.update_live_visualization(maze, config)
@@ -109,12 +125,12 @@ def maze_visualization(
 
 
 def different_color(
-    maze,
-    config,
-    solution_path,
+    maze: Maze,
+    config: Config,
+    solution_path: Optional[Sequence[Tuple[int, int]]],
     animate: bool = True,
     delay: float = 0.01,
-):
+) -> Optional[Sequence[Tuple[int, int]]]:
     """
     Löst Maze und markiert den Lösungsweg
     """
@@ -126,7 +142,7 @@ def different_color(
 
         # Markiere den finalen Lösungsweg
         for x, y in solution_path:
-            maze[y][x].mark_need_to_solve()  # type: ignore
+            maze[y][x].mark_need_to_solve()
 
             if animate:
                 vis.update_live_visualization_different_color(maze, config)

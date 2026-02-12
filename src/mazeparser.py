@@ -3,38 +3,61 @@
 Hier wir die logik genommen aus der config.txt werden die regel eingesetzt
 und in ein maze umgewandelt.
 """
-from typing import Dict, List, Optional, Tuple, Union
-from cell import Cell
+
+from __future__ import annotations
 
 import os
+from typing import Dict, List, Optional, Tuple, Union
+
+from cell import Cell
+
+ConfigValue = Union[int, bool, str, Tuple[int, int]]
+Config = Dict[str, ConfigValue]
+
+
+def _require_int(config: Config, key: str) -> int:
+    value = config.get(key)
+    if isinstance(value, int):
+        return value
+    raise ValueError(f"Config key {key} must be int")
+
+
+def _require_tuple(config: Config, key: str) -> Tuple[int, int]:
+    value = config.get(key)
+    if isinstance(value, tuple) and len(value) == 2:
+        x_val, y_val = value
+        return int(x_val), int(y_val)
+    raise ValueError(f"Config key {key} must be a tuple of two ints")
 
 
 def read_out_config(
     file_path: str,
-) -> Optional[Dict[str, Union[int, bool, str, Tuple[int, int]]]]:
+) -> Optional[Config]:
     """
     Nimmt die werte aus der Config.txt
     und gibt sie als dictionary zurueck
     die keys werden dann noch in integer und boolean umgewandelt.
     """
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]] = {}
+    config: Config = {}
 
     try:
         #  Versucht die config datei zu oeffnen und die werte in ein Dict macht
-        with open(file_path, 'r') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line in file:
                 line = line.strip()
-                if not line or line.startswith('#'):
+                if not line or line.startswith("#"):
                     continue  # Skip empty lines and comments
 
-                if '=' not in line:
+                if "=" not in line:
                     continue  # Skip lines without '='
 
-                key, value = line.split('=', 1)
+                key, value = line.split("=", 1)
                 if value.isdigit():
                     config[key] = int(value)
-                elif value.lower() in ['true']:
+                elif value.lower() == "true":
                     config[key] = True
+                elif value.lower() == "false":
+                    config[key] = False
                 else:
                     config[key] = value
 
@@ -55,36 +78,21 @@ def read_out_config(
                 raise ValueError(f"Missing required config key:{key}")
 
         #  checked ob die werte fuer die groesse des mazes passen
-        width: int = 0
-        height: int = 0
-        for i in config:
-            if i == "WIDTH":
-                val = config[i]
-                assert isinstance(val, int)
-                width = val
-            if i == "HEIGHT":
-                val = config[i]
-                assert isinstance(val, int)
-                height = val
-            if i == "ENTRY" or i == "EXIT":
-                val = config[i]
-                if isinstance(val, str):
-                    x, y = val.split(',')
-                    config[i] = (int(x.strip()), int(y.strip()))
+        width = _require_int(config, "WIDTH")
+        height = _require_int(config, "HEIGHT")
+        for key in ("ENTRY", "EXIT"):
+            value = config[key]
+            if isinstance(value, str):
+                x_val, y_val = value.split(",", 1)
+                config[key] = (int(x_val.strip()), int(y_val.strip()))
 
         if width < 3 or height < 3:
             raise ValueError(
                 "The Maze turned out to small. "
                 "At least 3x3 is required."
             )
-        entry_tuple = config['ENTRY']
-        exit_tuple = config['EXIT']
-        if not isinstance(entry_tuple, tuple) or len(entry_tuple) != 2:
-            raise ValueError("ENTRY must be a tuple of two integers")
-        if not isinstance(exit_tuple, tuple) or len(exit_tuple) != 2:
-            raise ValueError("EXIT must be a tuple of two integers")
-        entry_x, entry_y = int(entry_tuple[0]), int(entry_tuple[1])
-        exit_x, exit_y = int(exit_tuple[0]), int(exit_tuple[1])
+        entry_x, entry_y = _require_tuple(config, "ENTRY")
+        exit_x, exit_y = _require_tuple(config, "EXIT")
         if not -1 < entry_x < width:
             raise ValueError("The entry is out of bounds.")
         if not -1 < entry_y < height:
@@ -108,10 +116,7 @@ def read_out_config(
     return config
 
 
-def parse_maze_config(
-) -> Optional[
-    Tuple[List[List[Cell]], Dict[str, Union[int, bool, str, Tuple[int, int]]]]
-]:
+def parse_maze_config() -> Optional[Tuple[List[List[Cell]], Config]]:
     """
     Also die funktion macht die validierung der config werte,
     hier wird sich um die logik des Mazes auf Bit ebene gekuemmert.
@@ -128,12 +133,8 @@ def parse_maze_config(
     #  Initialisiere das Maze mit cells anstadt ints
     # maze[y][x] mit y=0..HEIGHT+1, x=0..WIDTH+1
     # Der Frame ist bei x=0, x=WIDTH+1, y=0, y=HEIGHT+1
-    width_val = config["WIDTH"]
-    height_val = config["HEIGHT"]
-    assert isinstance(width_val, int)
-    assert isinstance(height_val, int)
-    width = width_val
-    height = height_val
+    width = _require_int(config, "WIDTH")
+    height = _require_int(config, "HEIGHT")
     maze = [
         [Cell(x, y) for x in range(width + 2)]
         for y in range(height + 2)

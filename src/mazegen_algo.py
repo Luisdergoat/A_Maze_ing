@@ -3,18 +3,49 @@
 Docstring for algo
 """
 
-import random
-from typing import Dict, List, Sequence, Tuple, Union
+from __future__ import annotations
 
+import random
+from typing import Dict, List, Optional, Sequence, Tuple, Union
+
+from cell import Cell
 import visualize_maze
+
+ConfigValue = Union[int, bool, str, Tuple[int, int]]
+Config = Dict[str, ConfigValue]
+Maze = Sequence[Sequence[Cell]]
 
 
 steps: List[Tuple[int, int]] = []
 
 
+def _require_int(config: Config, key: str) -> int:
+    value = config.get(key)
+    if isinstance(value, int):
+        return value
+    raise ValueError(f"Config key {key} must be int")
+
+
+def _require_tuple(config: Config, key: str) -> Tuple[int, int]:
+    value = config.get(key)
+    if isinstance(value, tuple) and len(value) == 2:
+        x_val, y_val = value
+        return int(x_val), int(y_val)
+    raise ValueError(f"Config key {key} must be a tuple of two ints")
+
+
+def _require_bool(config: Config, key: str) -> bool:
+    value = config.get(key)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    raise ValueError(f"Config key {key} must be bool")
+
+
 def check_moves(
-    maze: Sequence[Sequence[object]],
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    maze: Maze,
+    config: Config,
     x: int,
     y: int,
 ) -> Dict[str, bool]:
@@ -32,33 +63,31 @@ def check_moves(
     # Check North: y-1
     if y > 1:  # y > 1 to avoid frame at y=0
         cell = maze[y - 1][x]
-        if not cell.is_visited() and not cell.frame:  # type: ignore
+        if not cell.is_visited() and not cell.frame:
             is_move_valid["N"] = True
     # Check South: y+1
-    height_val = config["HEIGHT"]
-    assert isinstance(height_val, int)
+    height_val = _require_int(config, "HEIGHT")
     if y < height_val:
         cell = maze[y + 1][x]
-        if not cell.is_visited() and not cell.frame:  # type: ignore
+        if not cell.is_visited() and not cell.frame:
             is_move_valid["S"] = True
     # Check East: x+1
-    width_val = config["WIDTH"]
-    assert isinstance(width_val, int)
+    width_val = _require_int(config, "WIDTH")
     if x < width_val:
         cell = maze[y][x + 1]
-        if not cell.is_visited() and not cell.frame:  # type: ignore
+        if not cell.is_visited() and not cell.frame:
             is_move_valid["E"] = True
     # Check West: x-1
     if x > 1:  # x > 1 to avoid frame at x=0
         cell = maze[y][x - 1]
-        if not cell.is_visited() and not cell.frame:  # type: ignore
+        if not cell.is_visited() and not cell.frame:
             is_move_valid["W"] = True
     return is_move_valid
 
 
 def check_walls(
-    maze: Sequence[Sequence[object]],
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    maze: Maze,
+    config: Config,
     x: int,
     y: int,
 ) -> Dict[str, bool]:
@@ -81,29 +110,27 @@ def check_walls(
         if not cell.frame:  # type: ignore
             is_move_valid["N"] = True
     # Check South: y+1
-    height_val = config["HEIGHT"]
-    assert isinstance(height_val, int)
+    height_val = _require_int(config, "HEIGHT")
     if y < height_val:
         cell = maze[y + 1][x]
-        if not cell.frame:  # type: ignore
+        if not cell.frame:
             is_move_valid["S"] = True
     # Check East: x+1
-    width_val = config["WIDTH"]
-    assert isinstance(width_val, int)
+    width_val = _require_int(config, "WIDTH")
     if x < width_val:
         cell = maze[y][x + 1]
-        if not cell.frame:  # type: ignore
+        if not cell.frame:
             is_move_valid["E"] = True
     # Check West: x-1
     if x > 1:  # x > 1 to avoid frame at x=0
         cell = maze[y][x - 1]
-        if not cell.frame:  # type: ignore
+        if not cell.frame:
             is_move_valid["W"] = True
     return is_move_valid
 
 
 def do_silent_next_move(
-    maze: Sequence[Sequence[object]],
+    maze: Maze,
     valid_moves: Dict[str, bool],
     x: int,
     y: int,
@@ -113,7 +140,7 @@ def do_silent_next_move(
     :param directions: Description
     """
     true_count = 0
-    key = None
+    key: Optional[str] = None
     for key in valid_moves:
         if valid_moves[key] is True:
             true_count += 1
@@ -123,23 +150,24 @@ def do_silent_next_move(
         key = random.choice(list(valid_moves.keys()))
         if valid_moves[key] is True:
             break
+    assert key is not None
     if key == "N":
         remove_wall_between(maze, x, y, "N")
-        new_x, new_y = x, y - 1
+        return x, y - 1
     if key == "E":
         remove_wall_between(maze, x, y, "E")
-        new_x, new_y = x + 1, y
+        return x + 1, y
     if key == "S":
         remove_wall_between(maze, x, y, "S")
-        new_x, new_y = x, y + 1
+        return x, y + 1
     if key == "W":
         remove_wall_between(maze, x, y, "W")
-        new_x, new_y = x - 1, y
-    return new_x, new_y
+        return x - 1, y
+    raise ValueError(f"Unknown direction: {key}")
 
 
 def do_next_move(
-    maze: Sequence[Sequence[object]],
+    maze: Maze,
     valid_moves: Dict[str, bool],
     x: int,
     y: int,
@@ -149,7 +177,7 @@ def do_next_move(
     :param directions: Description
     """
     true_count = 0
-    key = None
+    key: Optional[str] = None
     for key in valid_moves:
         if valid_moves[key] is True:
             true_count += 1
@@ -159,25 +187,28 @@ def do_next_move(
         key = random.choice(list(valid_moves.keys()))
         if valid_moves[key] is True:
             break
+    assert key is not None
     if key == "N":
         remove_wall_between(maze, x, y, "N")
         new_x, new_y = x, y - 1
-    if key == "E":
+    elif key == "E":
         remove_wall_between(maze, x, y, "E")
         new_x, new_y = x + 1, y
-    if key == "S":
+    elif key == "S":
         remove_wall_between(maze, x, y, "S")
         new_x, new_y = x, y + 1
-    if key == "W":
+    elif key == "W":
         remove_wall_between(maze, x, y, "W")
         new_x, new_y = x - 1, y
-    maze[new_y][new_x].mark_visited()  # type: ignore
+    else:
+        raise ValueError(f"Unknown direction: {key}")
+    maze[new_y][new_x].mark_visited()
     steps.append((new_x, new_y))
     return new_x, new_y
 
 
 def remove_wall_between(
-    maze: Sequence[Sequence[object]],
+    maze: Maze,
     x: int,
     y: int,
     direction: str,
@@ -192,26 +223,28 @@ def remove_wall_between(
     S = 13  # 1101
     W = 14  # 1110
     if direction == "N":
-        maze[y][x].set_wall(N)  # type: ignore
-        maze[y - 1][x].set_wall(S)  # type: ignore
-    if direction == "E":
-        maze[y][x].set_wall(E)  # type: ignore
-        maze[y][x + 1].set_wall(W)  # type: ignore
-    if direction == "S":
-        maze[y][x].set_wall(S)  # type: ignore
-        maze[y + 1][x].set_wall(N)  # type: ignore
-    if direction == "W":
-        maze[y][x].set_wall(W)  # type: ignore
-        maze[y][x - 1].set_wall(E)  # type: ignore
+        maze[y][x].set_wall(N)
+        maze[y - 1][x].set_wall(S)
+    elif direction == "E":
+        maze[y][x].set_wall(E)
+        maze[y][x + 1].set_wall(W)
+    elif direction == "S":
+        maze[y][x].set_wall(S)
+        maze[y + 1][x].set_wall(N)
+    elif direction == "W":
+        maze[y][x].set_wall(W)
+        maze[y][x - 1].set_wall(E)
+    else:
+        raise ValueError(f"Unknown direction: {direction}")
 
 
-def add_42_pattern(maze, config):
+def add_42_pattern(maze: Maze, config: Config) -> None:
     """
     Docstring for add_42_pattern
     :param maze: Description
     """
-    height = config['HEIGHT'] + 1
-    width = config['WIDTH'] + 1
+    height = _require_int(config, "HEIGHT") + 1
+    width = _require_int(config, "WIDTH") + 1
     mid_x = int(height / 2)
     mid_y = int(width / 2)
     if height < 8 or width < 10:
@@ -239,15 +272,17 @@ def add_42_pattern(maze, config):
     maze[mid_x - 2][mid_y + 1].mark_as_frame()
 
 
-def remove_extra_walls(maze, config) -> None:
+def remove_extra_walls(maze: Maze, config: Config) -> None:
     """
     Docstring for remove_extra_walls
     :param maze: Description
     :param config: Description
     """
+    height = _require_int(config, "HEIGHT")
+    width = _require_int(config, "WIDTH")
+    average_size = int(height + width / 2)
     for row in maze:
         for cell in row:
-            average_size = int(config["HEIGHT"] + config["WIDTH"] / 2)
             rand = random.randint(1, average_size)
             if (cell.get_x() % rand == 0 or cell.get_y() % rand == 0):
                 temp = cell.get_wall()
@@ -259,8 +294,8 @@ def remove_extra_walls(maze, config) -> None:
 
 
 def generat_maze(
-    maze: Sequence[Sequence[object]],
-    config: Dict[str, Union[int, bool, str, Tuple[int, int]]],
+    maze: Maze,
+    config: Config,
     animate: bool = False,
     delay: float = 0.01,
     color: str = "default",
@@ -275,16 +310,12 @@ def generat_maze(
 
     #  macht das maze und erstellt den weg halt ha
     # Config coordinates are without frame, so add +1 offset
-    entry_tuple = config["ENTRY"]
-    exit_tuple = config["EXIT"]
-    assert isinstance(entry_tuple, tuple)
-    assert isinstance(exit_tuple, tuple)
-    entry_x, entry_y = entry_tuple
-    exit_x, exit_y = exit_tuple
+    entry_x, entry_y = _require_tuple(config, "ENTRY")
+    exit_x, exit_y = _require_tuple(config, "EXIT")
     exit_x, exit_y = exit_x + 1, exit_y + 1  # Add frame
     x, y = entry_x + 1, entry_y + 1  # Add frame offset
-    maze[y][x].mark_visited()  # type: ignore
-    maze[exit_y][exit_x].mark_visited()  # type: ignore
+    maze[y][x].mark_visited()
+    maze[exit_y][exit_x].mark_visited()
     steps.append((x, y))
 
     # Start Live-Visualisierung
@@ -302,15 +333,21 @@ def generat_maze(
         )
 
     # handle seeds
-    seed_val = config['SEED']
-    try:
-        seed_int = int(seed_val)  # type: ignore
-    except ValueError:
+    seed_val = config["SEED"]
+    seed_int: int
+    if isinstance(seed_val, int):
+        seed_int = seed_val
+    elif isinstance(seed_val, str):
+        try:
+            seed_int = int(seed_val)
+        except ValueError:
+            seed_int = random.randint(-2147483648, 2147483647)
+    else:
         seed_int = random.randint(-2147483648, 2147483647)
     random.seed(seed_int)
 
     # add 42 pattern
-    if config['42PATTERN'] is True:
+    if _require_bool(config, "42PATTERN") is True:
         add_42_pattern(maze, config)
 
     exit_moves = check_moves(
@@ -325,7 +362,7 @@ def generat_maze(
         exit_x,
         exit_y,
     )
-    move_count = 0
+    perfect_maze = _require_bool(config, "PERFECT")
     while True:
         valid_moves = check_moves(maze, config, x, y)
         x, y = do_next_move(
@@ -334,7 +371,6 @@ def generat_maze(
             x,
             y,
         )
-        move_count += 1
 
         # Aktualisiere Live-Visualisierung für jeden Move
         if animate:
@@ -355,7 +391,6 @@ def generat_maze(
         # remove_wall_between(maze, last_cell, (x, y))
         # muss hier gemacht werden
         # try:
-        perfect_maze = config["PERFECT"]
         # except ValueError:
         #     pass
         if x == -1:
@@ -363,7 +398,7 @@ def generat_maze(
                 x, y = steps.pop()
             else:
                 break
-    if perfect_maze == "False":
+    if not perfect_maze:
         remove_extra_walls(maze, config)
 
     # Stoppe Live-Visualisierung

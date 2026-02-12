@@ -14,8 +14,9 @@ Beispiel: 1111 (15) = alle Wände geschlossen
 
 from __future__ import annotations
 
-from typing import List, Mapping, Optional, Sequence, Tuple, cast
+from typing import List, Mapping, Optional, Sequence, Tuple, Union
 
+from cell import Cell
 import mazeparser
 from rich import box
 from rich.console import Console
@@ -26,23 +27,40 @@ from rich.text import Text
 
 console = Console()
 
-ConfigMapping = Mapping[str, object]
+ConfigValue = Union[Tuple[int, int], int, bool, str]
+ConfigMapping = Mapping[str, ConfigValue]
+CellMaze = Sequence[Sequence[Cell]]
 
 
 # Globale Variable für Live-Display
 _live_display: Optional[Live] = None
 
 
+def _require_int(config: ConfigMapping, key: str) -> int:
+    value = config.get(key)
+    if isinstance(value, int):
+        return value
+    raise ValueError(f"Config key {key} must be int")
+
+
 def _get_entry_exit(
     config: ConfigMapping,
 ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
-    entry = cast(Tuple[int, int], config.get("ENTRY", (0, 0)))
-    exit_pos = cast(Tuple[int, int], config.get("EXIT", (0, 0)))
+    entry_val = config.get("ENTRY")
+    exit_val = config.get("EXIT")
+    if isinstance(entry_val, tuple) and len(entry_val) == 2:
+        entry = (int(entry_val[0]), int(entry_val[1]))
+    else:
+        entry = (0, 0)
+    if isinstance(exit_val, tuple) and len(exit_val) == 2:
+        exit_pos = (int(exit_val[0]), int(exit_val[1]))
+    else:
+        exit_pos = (0, 0)
     return entry, exit_pos
 
 
 def start_live_visualization(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Optional[Live]:
@@ -57,15 +75,8 @@ def start_live_visualization(
     width = len(maze[0]) if height > 0 else 0
 
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     entry, exit_pos = _get_entry_exit(config)
     entry_x, entry_y = entry
@@ -105,7 +116,7 @@ def start_live_visualization(
 
 
 def start_live_visualization_different_color(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Optional[Live]:
@@ -120,15 +131,8 @@ def start_live_visualization_different_color(
     width = len(maze[0]) if height > 0 else 0
 
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     entry, exit_pos = _get_entry_exit(config)
     entry_x, entry_y = entry
@@ -166,22 +170,9 @@ def start_live_visualization_different_color(
     _live_display.start()
     return _live_display
 
-    # Erstelle eine zentierte Version des Panels
-    from rich.align import Align
-
-    centered_panel = Align.center(panel)
-
-    _live_display = Live(
-        centered_panel,
-        console=console,
-        refresh_per_second=120,
-    )
-    _live_display.start()
-    return _live_display
-
 
 def update_live_visualization(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> None:
@@ -198,15 +189,8 @@ def update_live_visualization(
     width = len(maze[0]) if height > 0 else 0
 
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     entry, exit_pos = _get_entry_exit(config)
     entry_x, entry_y = entry
@@ -247,7 +231,7 @@ def stop_live_visualization() -> None:
 
 
 def update_live_visualization_different_color(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> None:
@@ -264,15 +248,8 @@ def update_live_visualization_different_color(
     width = len(maze[0]) if height > 0 else 0
 
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     entry, exit_pos = _get_entry_exit(config)
     entry_x, entry_y = entry
@@ -304,7 +281,7 @@ def update_live_visualization_different_color(
 
 
 def convert_cells_to_maze_array(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
 ) -> List[List[int]]:
     """
     Konvertiert ein 2D-Array von Cell-Objekten zu einem Bit-Maze Array.
@@ -315,14 +292,6 @@ def convert_cells_to_maze_array(
     if not cell_maze or not cell_maze[0]:
         return []
 
-    def get_wall_value(cell: object) -> int:
-        if hasattr(cell, "get_wall"):
-            return int(cell.get_wall())
-        if hasattr(cell, "wall"):
-            return int(cell.wall)
-        return 15
-
-    # Use actual array dimensions
     num_rows = len(cell_maze)
     num_cols = len(cell_maze[0]) if num_rows > 0 else 0
 
@@ -330,22 +299,19 @@ def convert_cells_to_maze_array(
         return []
 
     # Create the maze array with all cells including frame
-    result_maze = []
+    result_maze: List[List[int]] = []
     for y in range(num_rows):
-        row = []
+        row: List[int] = []
         for x in range(num_cols):
-            try:
-                cell = cell_maze[y][x]
-                row.append(get_wall_value(cell))
-            except (IndexError, AttributeError):
-                row.append(15)
+            cell = cell_maze[y][x]
+            row.append(int(cell.get_wall()))
         result_maze.append(row)
 
     return result_maze
 
 
 def visualize_cell_maze(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     clear_screen: bool = False,
     show_config: bool = True,
@@ -381,15 +347,8 @@ def visualize_cell_maze(
 
     # Check if cell_maze has frame
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     # Adjust entry/exit coordinates if frame exists
     # Config coordinates refer to maze without frame
@@ -431,7 +390,7 @@ def visualize_cell_maze(
 
 
 def visualize_cell_maze_different_color(
-    cell_maze: Sequence[Sequence[object]],
+    cell_maze: CellMaze,
     config: ConfigMapping,
     clear_screen: bool = False,
     show_config: bool = True,
@@ -467,15 +426,8 @@ def visualize_cell_maze_different_color(
 
     # Check if cell_maze has frame
     has_frame = False
-    if len(cell_maze) > 2 and len(cell_maze[0]) > 2:
-        try:
-            if (
-                hasattr(cell_maze[0][0], "frame")
-                and cell_maze[0][0].frame
-            ):
-                has_frame = True
-        except (IndexError, AttributeError):
-            pass
+    if cell_maze and cell_maze[0]:
+        has_frame = cell_maze[0][0].frame
 
     # Adjust entry/exit coordinates if frame exists
     # Config coordinates refer to maze without frame
@@ -553,7 +505,7 @@ def print_maze_visual_rich(
     entry_y: int,
     exit_x: int,
     exit_y: int,
-    cell_maze: Optional[Sequence[Sequence[object]]] = None,
+    cell_maze: Optional[CellMaze] = None,
     has_frame: bool = False,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Panel:
@@ -581,13 +533,9 @@ def print_maze_visual_rich(
     for x in range(actual_width):
         cell = maze[0][x]
         is_frame = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[0][x]
-                if hasattr(cell_obj, "frame"):
-                    is_frame = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[0][x]
+            is_frame = cell_obj.frame
 
         color = "white" if is_frame else "white"
 
@@ -616,17 +564,10 @@ def print_maze_visual_rich(
             # Check for frame
             is_frame = False
             is_solving = False
-            if cell_maze:
-                try:
-                    cell_obj = cell_maze[y][x]
-                    if hasattr(cell_obj, "frame"):
-                        is_frame = cell_obj.frame
-                    if hasattr(cell_obj, "visited"):
-                        pass
-                    if hasattr(cell_obj, "solve_need"):
-                        is_solving = cell_obj.solve_need
-                except (IndexError, AttributeError):
-                    pass
+            if cell_maze is not None:
+                cell_obj = cell_maze[y][x]
+                is_frame = cell_obj.frame
+                is_solving = cell_obj.solve_need
 
             color = "white" if is_frame else "white"
 
@@ -654,13 +595,9 @@ def print_maze_visual_rich(
         # Right wall
         rightmost = maze[y][actual_width - 1]
         is_frame_right = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[y][actual_width - 1]
-                if hasattr(cell_obj, "frame"):
-                    is_frame_right = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[y][actual_width - 1]
+            is_frame_right = cell_obj.frame
 
         color_right = "white" if is_frame_right else "white"
         if rightmost & 4:
@@ -677,13 +614,9 @@ def print_maze_visual_rich(
             cell = maze[y][x]
 
             is_frame = False
-            if cell_maze:
-                try:
-                    cell_obj = cell_maze[y][x]
-                    if hasattr(cell_obj, "frame"):
-                        is_frame = cell_obj.frame
-                except (IndexError, AttributeError):
-                    pass
+            if cell_maze is not None:
+                cell_obj = cell_maze[y][x]
+                is_frame = cell_obj.frame
 
             color = "white" if is_frame else "white"
 
@@ -705,13 +638,9 @@ def print_maze_visual_rich(
 
         # Right edge
         is_frame_right = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[y][actual_width - 1]
-                if hasattr(cell_obj, "frame"):
-                    is_frame_right = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[y][actual_width - 1]
+            is_frame_right = cell_obj.frame
 
         color_right = "white" if is_frame_right else "white"
         if y == actual_height - 1:
@@ -733,50 +662,6 @@ def print_maze_visual_rich(
         expand=False,
     )
 
-    # Bit-Legende
-    legend = Table(
-        title="[bold yellow]Bit-Legende[/bold yellow]",
-        box=box.SIMPLE,
-        border_style="yellow",
-    )
-    legend.add_column("Bit", justify="center", style="cyan")
-    legend.add_column("Wert", justify="center", style="white")
-    legend.add_column("Position", style="green")
-    legend.add_column("Beispiel", style="magenta")
-
-    legend.add_row("3", "8", "Oben ↑", "1000")
-    legend.add_row("2", "4", "Rechts →", "0100")
-    legend.add_row("1", "2", "Unten ↓", "0010")
-    legend.add_row("0", "1", "Links ←", "0001")
-
-    console.print(legend)
-
-    # Zusätzliche Info
-    info_text = Text()
-    info_text.append(
-        "15 (1111) = alle Wände zu",
-        style="dim",
-    )
-    info_text.append("  |  ")
-    info_text.append(
-        "0 (0000) = alle Wände offen",
-        style="bold blue",
-    )
-    info_text.append("  |  ")
-    info_text.append(
-        "E",
-        style="bold green on black",
-    )
-    info_text.append(" = Entry  |  ")
-    info_text.append(
-        "X",
-        style="bold red on black",
-    )
-    info_text.append(" = Exit  |  ")
-    info_text.append("█", style="on red")
-    info_text.append(" = Frame")
-    console.print(Panel(info_text, border_style="blue"))
-
 
 def change_maze_color(
     maze: Sequence[Sequence[int]],
@@ -786,7 +671,7 @@ def change_maze_color(
     entry_y: int,
     exit_x: int,
     exit_y: int,
-    cell_maze: Optional[Sequence[Sequence[object]]] = None,
+    cell_maze: Optional[CellMaze] = None,
     has_frame: bool = False,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Panel:
@@ -814,13 +699,9 @@ def change_maze_color(
     for x in range(actual_width):
         cell = maze[0][x]
         is_frame = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[0][x]
-                if hasattr(cell_obj, "frame"):
-                    is_frame = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[0][x]
+            is_frame = cell_obj.frame
 
         color = "pink" if is_frame else "blue"
 
@@ -849,17 +730,10 @@ def change_maze_color(
             # Check for frame
             is_frame = False
             is_solving = False
-            if cell_maze:
-                try:
-                    cell_obj = cell_maze[y][x]
-                    if hasattr(cell_obj, "frame"):
-                        is_frame = cell_obj.frame
-                    if hasattr(cell_obj, "visited"):
-                        pass
-                    if hasattr(cell_obj, "solve_need"):
-                        is_solving = cell_obj.solve_need
-                except (IndexError, AttributeError):
-                    pass
+            if cell_maze is not None:
+                cell_obj = cell_maze[y][x]
+                is_frame = cell_obj.frame
+                is_solving = cell_obj.solve_need
 
             color = "pink" if is_frame else "bold grey"
 
@@ -886,13 +760,9 @@ def change_maze_color(
         # Right wall
         rightmost = maze[y][actual_width - 1]
         is_frame_right = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[y][actual_width - 1]
-                if hasattr(cell_obj, "frame"):
-                    is_frame_right = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[y][actual_width - 1]
+            is_frame_right = cell_obj.frame
 
         color_right = "pink" if is_frame_right else "bold grey"
         if rightmost & 4:
@@ -909,13 +779,9 @@ def change_maze_color(
             cell = maze[y][x]
 
             is_frame = False
-            if cell_maze:
-                try:
-                    cell_obj = cell_maze[y][x]
-                    if hasattr(cell_obj, "frame"):
-                        is_frame = cell_obj.frame
-                except (IndexError, AttributeError):
-                    pass
+            if cell_maze is not None:
+                cell_obj = cell_maze[y][x]
+                is_frame = cell_obj.frame
 
             color = "pink" if is_frame else "bold grey"
 
@@ -937,13 +803,9 @@ def change_maze_color(
 
         # Right edge
         is_frame_right = False
-        if cell_maze:
-            try:
-                cell_obj = cell_maze[y][actual_width - 1]
-                if hasattr(cell_obj, "frame"):
-                    is_frame_right = cell_obj.frame
-            except (IndexError, AttributeError):
-                pass
+        if cell_maze is not None:
+            cell_obj = cell_maze[y][actual_width - 1]
+            is_frame_right = cell_obj.frame
 
         color_right = "pink" if is_frame_right else "bold grey"
         if y == actual_height - 1:
@@ -965,50 +827,6 @@ def change_maze_color(
         expand=False,
     )
 
-    # Bit-Legende
-    legend = Table(
-        title="[bold yellow]Bit-Legende[/bold yellow]",
-        box=box.SIMPLE,
-        border_style="yellow",
-    )
-    legend.add_column("Bit", justify="center", style="cyan")
-    legend.add_column("Wert", justify="center", style="white")
-    legend.add_column("Position", style="green")
-    legend.add_column("Beispiel", style="magenta")
-
-    legend.add_row("3", "8", "Oben ↑", "1000")
-    legend.add_row("2", "4", "Rechts →", "0100")
-    legend.add_row("1", "2", "Unten ↓", "0010")
-    legend.add_row("0", "1", "Links ←", "0001")
-
-    console.print(legend)
-
-    # Zusätzliche Info
-    info_text = Text()
-    info_text.append(
-        "15 (1111) = alle Wände zu",
-        style="dim",
-    )
-    info_text.append("  |  ")
-    info_text.append(
-        "0 (0000) = alle Wände offen",
-        style="bold blue",
-    )
-    info_text.append("  |  ")
-    info_text.append(
-        "E",
-        style="bold green on black",
-    )
-    info_text.append(" = Entry  |  ")
-    info_text.append(
-        "X",
-        style="bold red on black",
-    )
-    info_text.append(" = Exit  |  ")
-    info_text.append("█", style="on red")
-    info_text.append(" = Frame")
-    console.print(Panel(info_text, border_style="blue"))
-
 
 def visualize_maze(config_path: str) -> None:
     """
@@ -1019,8 +837,8 @@ def visualize_maze(config_path: str) -> None:
         console.print("Fehler beim Lesen der Config-Datei.")
         return
 
-    width = int(config["WIDTH"])  # type: ignore
-    height = int(config["HEIGHT"])  # type: ignore
+    width = _require_int(config, "WIDTH")
+    height = _require_int(config, "HEIGHT")
     entry, exit_pos = _get_entry_exit(config)
     entry_x, entry_y = entry
     exit_x, exit_y = exit_pos
@@ -1045,7 +863,7 @@ def visualize_maze(config_path: str) -> None:
         maze[exit_y][exit_x] = 0
 
     # Zeige Config-Info
-    print_config_info(config)
+    console.print(print_config_info(config))
     console.print()
 
     # Zeige visuelles Maze
@@ -1069,7 +887,7 @@ def load_maze_from_file(file_path: str) -> Optional[List[List[int]]]:
     """
     try:
         maze = []
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):
