@@ -30,10 +30,6 @@ MAZE_TXT	= $(SRC_DIR)/maze.txt
 
 # Python files
 MAIN		= $(SRC_DIR)/main.py
-VISUALIZER	= $(SRC_DIR)/visualize_maze.py
-PARSER		= $(SRC_DIR)/mazeparser.py
-SOLVER		= $(SRC_DIR)/solve_maze_algo.py
-OUTPUT_FILE	= $(SRC_DIR)/output_file.py
 
 # ================================ TARGETS ================================= #
 

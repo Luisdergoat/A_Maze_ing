@@ -73,7 +73,7 @@ def _intro(screen: Screen) -> None:
         Print(
             screen,
             banner,
-            y=max(0, screen.height // 2 - 4),
+            y=max(0, screen.height - int((screen.height / 0.5))),
             colour=Screen.COLOUR_WHITE,
             transparent=True,
         ),

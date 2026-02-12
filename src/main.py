@@ -4,7 +4,7 @@ Docstring for main
 
 
 import os
-from intro_animation import play_hacker_screen, play_intro
+from intro_animation import play_intro
 import mazeparser
 import visualize_maze as vizualizer
 from mazegen_algo import generat_maze
@@ -14,8 +14,8 @@ from pyfiglet import figlet_format
 
 
 def main():
-    # os.system("clear") # mach fuer die animation ein pre clear, damit cleaner ist
-    # play_intro() # Optional: Intro Animation fuer den WoW Effect in der eval
+    os.system("clear")  # mach fuer die animation ein pre clear, damit cleaner ist
+    play_intro()  # Optional: Intro Animation fuer den WoW Effect in der eval
     os.system("clear")
     counter = 0
     while True:
@@ -44,7 +44,7 @@ def main():
                 generat_maze(
                     maze,
                     config,
-                    animate=False,
+                    animate=True,
                     delay=0.00000001,
                 )
                 # Löse das Maze und markiere den Lösungsweg
@@ -57,7 +57,7 @@ def main():
                     maze,
                     config,
                     solution,
-                    animate=False,
+                    animate=True,
                     delay=0.01
                 )
 
@@ -92,9 +92,6 @@ def main():
         elif option == 4:
             os.system("clear")
             print(figlet_format("Try Again!", font="slant"))
-            if counter == 0:
-                pass
-                # play_hacker_screen() # Optional: easter egg wenn man schliess ohne maze zu erzeugen
             return
         elif option == 5:
             os.system("clear")
