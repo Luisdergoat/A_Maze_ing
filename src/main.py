@@ -54,7 +54,7 @@ def main():
                         maze,
                         config,
                     )
-                    # os.system("clear")
+                    os.system("clear")
                     maze_visualization(
                         maze,
                         config,
@@ -88,7 +88,7 @@ def main():
                         maze,
                         config,
                     )
-                    # os.system("clear")
+                    os.system("clear")
                     different_color(
                         maze,
                         config,

@@ -103,10 +103,6 @@ def maze_visualization(
         if animate:
             vis.stop_live_visualization()
 
-        print(f"Pfadlänge: {len(solution_path)}")
-        print(f"Start: {solution_path[0]}")
-        print(f"Ende: {solution_path[-1]}")
-
         return solution_path
 
     return None
@@ -138,10 +134,6 @@ def different_color(
 
         if animate:
             vis.stop_live_visualization()
-
-        print(f"Pfadlänge: {len(solution_path)}")
-        print(f"Start: {solution_path[0]}")
-        print(f"Ende: {solution_path[-1]}")
 
         return solution_path
 

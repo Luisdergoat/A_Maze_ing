@@ -404,44 +404,6 @@ def visualize_cell_maze(
         exit_x += 1
         exit_y += 1
 
-    # TODO: Hier können später die Wände basierend auf
-    # den Cell-Verbindungen gesetzt werden
-
-    # Zeige Config-Info
-    if show_config:
-        from rich.align import Align
-
-        config_panel = print_config_info(config)
-        console.print(Align.center(config_panel))
-        console.print()
-
-    # Zeige Bit-Tabelle
-    if show_table:
-        from rich.align import Align
-
-        table = print_maze_table(
-            maze,
-            width,
-            height,
-            entry_x,
-            entry_y,
-            exit_x,
-            exit_y,
-        )
-        console.print(Align.center(table))
-        console.print()
-    table = print_maze_table(
-        maze,
-        width,
-        height,
-        entry_x,
-        entry_y,
-        exit_x,
-        exit_y,
-    )
-    console.print(Align.center(table))
-    console.print()
-
     # Zeige visuelles Maze
     panel = print_maze_visual_rich(
         maze,
@@ -454,6 +416,13 @@ def visualize_cell_maze(
         cell_maze=cell_maze,
         has_frame=has_frame,
     )
+
+    if show_config:
+        from rich.align import Align
+
+        config_panel = print_config_info(config)
+        console.print(Align.center(config_panel))
+        console.print()
 
     if clear_screen:
         console.clear()
@@ -521,44 +490,7 @@ def visualize_cell_maze_different_color(
         exit_x += 1
         exit_y += 1
 
-    # TODO: Hier können später die Wände basierend auf
-    # den Cell-Verbindungen gesetzt werden
-
     # Zeige Config-Info
-    if show_config:
-        from rich.align import Align
-
-        config_panel = print_config_info(config)
-        console.print(Align.center(config_panel))
-        console.print()
-
-    # Zeige Bit-Tabelle
-    if show_table:
-        from rich.align import Align
-
-        table = print_maze_table(
-            maze,
-            width,
-            height,
-            entry_x,
-            entry_y,
-            exit_x,
-            exit_y,
-        )
-        console.print(Align.center(table))
-        console.print()
-    table = print_maze_table(
-        maze,
-        width,
-        height,
-        entry_x,
-        entry_y,
-        exit_x,
-        exit_y,
-    )
-    console.print(Align.center(table))
-    console.print()
-
     # Zeige visuelles Maze
     panel = change_maze_color(
         maze,
@@ -571,6 +503,13 @@ def visualize_cell_maze_different_color(
         cell_maze=cell_maze,
         has_frame=has_frame,
     )
+
+    if show_config:
+        from rich.align import Align
+
+        config_panel = print_config_info(config)
+        console.print(Align.center(config_panel))
+        console.print()
 
     if clear_screen:
         console.clear()
@@ -604,86 +543,6 @@ def print_config_info(config: ConfigMapping) -> Table:
     )
 
     return table
-
-
-def print_maze_table(
-    maze: Sequence[Sequence[int]],
-    width: int,
-    height: int,
-    entry_x: int,
-    entry_y: int,
-    exit_x: int,
-    exit_y: int,
-) -> Table:
-    """
-    Zeigt das Maze als Tabelle mit Bit-Zahlen an.
-    """
-    # Validate dimensions
-    if not maze or not maze[0]:
-        return Table(title="Fehler: Maze ist leer")
-
-    actual_height = len(maze)
-    actual_width = len(maze[0])
-
-    table = Table(
-        title=(
-            "[bold magenta]Maze Bit-"
-            "Repräsentation[/bold magenta]"
-        ),
-        box=box.HEAVY,
-        border_style="magenta",
-    )
-
-    # Header mit Spalten-Nummern
-    table.add_column("Y\\X", justify="center", style="bold cyan")
-    for x in range(actual_width):
-        table.add_column(str(x), justify="center", style="dim")
-
-    for y in range(actual_height):
-        row_data = [str(y)]
-        for x in range(actual_width):
-            cell_value = maze[y][x]
-
-            # Markiere Entry und Exit
-            if (x, y) == (entry_x, entry_y):
-                row_data.append(
-                    f"[bold green]E{cell_value:02d}"
-                    "[/bold green]"
-                )
-            elif (x, y) == (exit_x, exit_y):
-                row_data.append(
-                    f"[bold red]X{cell_value:02d}"
-                    "[/bold red]"
-                )
-            elif cell_value == 0:
-                row_data.append(
-                    f"[bold blue]{cell_value:02d}"
-                    "[/bold blue]"
-                )
-            elif cell_value == 15:
-                row_data.append(f"[dim]{cell_value:02d}[/dim]")
-            else:
-                row_data.append(
-                    f"[yellow]{cell_value:02d}"
-                    "[/yellow]"
-                )
-
-        table.add_row(*row_data)
-
-    return table
-
-    # Legende
-    legend = Text()
-    legend.append("Legende: ", style="bold")
-    legend.append("E", style="bold green")
-    legend.append("=Entry  ")
-    legend.append("X", style="bold red")
-    legend.append("=Exit  ")
-    legend.append("15", style="dim")
-    legend.append("=Alle Wände zu  ")
-    legend.append("0", style="bold blue")
-    legend.append("=Alle Wände offen")
-    console.print(Panel(legend, border_style="cyan"))
 
 
 def print_maze_visual_rich(
@@ -1187,18 +1046,6 @@ def visualize_maze(config_path: str) -> None:
 
     # Zeige Config-Info
     print_config_info(config)
-    console.print()
-
-    # Zeige Bit-Tabelle
-    print_maze_table(
-        maze,
-        width,
-        height,
-        entry_x,
-        entry_y,
-        exit_x,
-        exit_y,
-    )
     console.print()
 
     # Zeige visuelles Maze

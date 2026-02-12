@@ -9,7 +9,7 @@ from random import choice, randint
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
 from asciimatics.effects import Effect, Print
-from asciimatics.renderers import FigletText, StaticRenderer
+from asciimatics.renderers import FigletText
 from asciimatics.exceptions import ResizeScreenError, StopApplication
 
 
