@@ -51,6 +51,7 @@ def check_valid_moves(
     return moves
 
 
+# gerade bug hier wir None returnt deswegen wir das Maze nicht gelöst
 def maze_solve(
     maze: Maze,
     config: Config,
@@ -83,17 +84,17 @@ def maze_solve(
             parent_map[(new_x, new_y)] = (x, y)
             queue.append((new_x, new_y))
 
+        if (exit_x, exit_y) not in parent_map:
+            return None  # Kein Pfad gefunden
+
         path = []
         current = (exit_x, exit_y)
 
         while current != (start_x, start_y):
-            print(current)
-            path.append((start_x, start_y))
-            current = parent_map.get(current)
-            if current is None:
-                return ("No path found")  # Kein Pfad gefunden, soll nicht passieren
+            path.append(current)
+            current = parent_map.get([current])
 
-        path.append(start_x, start_y)
+        path.append((start_x, start_y))
         path.reverse()
         return path
 
