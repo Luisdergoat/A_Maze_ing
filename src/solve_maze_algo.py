@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from cell import Cell
 import visualize_maze as vis
+from collections import deque
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]
@@ -54,6 +55,7 @@ def maze_solve(
     maze: Maze,
     config: Config,
 ) -> Optional[List[Tuple[int, int]]]:
+
     # Entry und Exit holen (mit Frame-Offset)
     entry_tuple = config["ENTRY"]
     exit_tuple = config["EXIT"]
@@ -62,34 +64,38 @@ def maze_solve(
 
     start_x, start_y = entry_tuple[0] + 1, entry_tuple[1] + 1  # Frame offset
     exit_x, exit_y = exit_tuple[0] + 1, exit_tuple[1] + 1
-    stack: List[Tuple[int, int, List[Tuple[int, int]]]] = [
-        (start_x, start_y, [])
-    ]
-    visited: Set[Tuple[int, int]] = set()
 
-    while stack:
-        x, y, path = stack.pop()
+    queue = deque([(start_x, start_y)])
+    visited: Set[Tuple[int, int]] = set()
+    visited.add((start_x, start_y))
+
+    parent_map = {}
+
+    while queue:
+        x, y = queue.popleft()
 
         # Bereits besucht? Skip
-        if (x, y) in visited:
-            continue
+        if (x, y) == (exit_x, exit_y):
+            break
 
-        # Markiere als besucht
-        visited.add((x, y))
-        current_path = path + [(x, y)]
+        for direction, new_x, new_y in check_valid_moves(maze, x, y, visited):
+            visited.add((new_x, new_y))
+            parent_map[(new_x, new_y)] = (x, y)
+            queue.append((new_x, new_y))
 
-        # Exit erreicht?
-        if x == exit_x and y == exit_y:
-            return current_path
+        path = []
+        current = (exit_x, exit_y)
 
-        # Finde alle möglichen Moves
-        possible_moves = check_valid_moves(maze, x, y, visited)
+        while current != (start_x, start_y):
+            print(current)
+            path.append((start_x, start_y))
+            current = parent_map.get(current)
+            if current is None:
+                return ("No path found")  # Kein Pfad gefunden, soll nicht passieren
 
-        # Füge alle Moves zum Stack hinzu
-        for _direction, new_x, new_y in possible_moves:
-            stack.append((new_x, new_y, current_path))
-
-    return None
+        path.append(start_x, start_y)
+        path.reverse()
+        return path
 
 
 def maze_visualization(
