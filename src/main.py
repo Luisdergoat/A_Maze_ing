@@ -61,8 +61,6 @@ def main() -> None:
                 color=color,
             )
             solution = maze_solve(maze, config)
-            print("Solution:", solution)
-            return
             os.system("clear")
 
             if color == "default":

@@ -84,19 +84,20 @@ def maze_solve(
             parent_map[(new_x, new_y)] = (x, y)
             queue.append((new_x, new_y))
 
-        if (exit_x, exit_y) not in parent_map:
-            return None  # Kein Pfad gefunden
+    if (exit_x, exit_y) not in parent_map:
+        return None  # Kein Pfad gefunden
 
-        path = []
-        current = (exit_x, exit_y)
+    path = []
+    current = (exit_x, exit_y)
 
-        while current != (start_x, start_y):
-            path.append(current)
-            current = parent_map.get([current])
+    path.append(current)
+    while current != (start_x, start_y):
+        path.append(current)
+        current = parent_map.get(current)
 
-        path.append((start_x, start_y))
-        path.reverse()
-        return path
+    path.append((start_x, start_y))
+    path.reverse()
+    return path
 
 
 def maze_visualization(
