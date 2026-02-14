@@ -8,6 +8,7 @@ import os
 from typing import Dict, List, Optional, Tuple, Union
 
 from cell import Cell
+from option_menu import play_option_menu
 from intro_animation import play_intro
 import mazeparser
 from mazegen_algo import generat_maze
@@ -39,14 +40,19 @@ def main() -> None:
     config: Optional[Config] = None
     while True:
         result = mazeparser.parse_maze_config()
-        _print_menu()
-        try:
-            option = int(input("Choose option: "))
-            os.system("clear")
-        except ValueError:
-            os.system("clear")
-            print("Enter a valid number")
-            continue
+        option = play_option_menu()
+        if isinstance(option, int):
+            try:
+                option = int(chr(option))
+            except (ValueError, TypeError):
+                option = None
+        # try:
+        #     option = int(input("Choose option: "))
+        #     os.system("clear")
+        # except ValueError:
+        #     os.system("clear")
+        #     print("Enter a valid number")
+        #     continue
         if option == 1:
             if result is None:
                 print("Config konnte nicht gelesen werden.")
@@ -89,9 +95,8 @@ def main() -> None:
                     config,
                     clear_screen=True,
                 )
-
             generate_output_file(maze, config, solution)
-
+            input()
         elif option == 2:
             os.system("nvim config.txt")
             continue
@@ -132,7 +137,7 @@ def main() -> None:
             return
         else:
             os.system("clear")
-            print("Enter a valid number")
+            print("Enter a valid number, not:", option)
             continue
 
 
