@@ -90,7 +90,7 @@ def main() -> None:
                     clear_screen=True,
                 )
 
-            generate_output_file(maze, config)
+            generate_output_file(maze, config, solution)
 
         elif option == 2:
             os.system("nvim config.txt")
