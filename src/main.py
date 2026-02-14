@@ -22,15 +22,6 @@ Config = Dict[str, ConfigValue]
 Maze = List[List[Cell]]
 
 
-def _print_menu() -> None:
-    print("Choose one of the options")
-    print("1: generate Maze")
-    print("2: edit config")
-    print("3: change colour (geht nicht)")
-    print("4: exit")
-    print("5: exit with cleanup")
-
-
 def main() -> None:
     os.system("clear")  # clear before intro animation
     play_intro()  # Optional: Intro Animation fuer den WoW Effect in der eval
@@ -46,13 +37,6 @@ def main() -> None:
                 option = int(chr(option))
             except (ValueError, TypeError):
                 option = None
-        # try:
-        #     option = int(input("Choose option: "))
-        #     os.system("clear")
-        # except ValueError:
-        #     os.system("clear")
-        #     print("Enter a valid number")
-        #     continue
         if option == 1:
             if result is None:
                 print("Config konnte nicht gelesen werden.")

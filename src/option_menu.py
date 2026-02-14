@@ -78,8 +78,9 @@ class ExitOnKey(Effect):
 
     def process_event(self, event):
         if isinstance(event, KeyboardEvent):
-            self.key = event.key_code
-            raise StopApplication("key pressed")
+            if event.key_code in (ord('1'), ord('2'), ord('3'), ord('4'), ord('5')):
+                self.key = event.key_code
+                raise StopApplication("key pressed")
         return event
 
     @property
@@ -116,7 +117,6 @@ def _options(screen: Screen) -> int | None:
             colour=Screen.COLOUR_WHITE,
             transparent=True,
         ),
-        
         exit_effect,
     ]
 
