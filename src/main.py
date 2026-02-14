@@ -32,12 +32,12 @@ def main() -> None:
     while True:
         result = mazeparser.parse_maze_config()
         option = play_option_menu()
-        if isinstance(option, int):
-            try:
-                option = int(chr(option))
-            except (ValueError, TypeError):
-                option = None
+        try:
+            option = int(chr(option))
+        except (ValueError, TypeError):
+            option = None
         if option == 1:
+            os.system("clear")
             if result is None:
                 print("Config konnte nicht gelesen werden.")
                 continue
@@ -47,7 +47,7 @@ def main() -> None:
                 maze,
                 config,
                 animate=True,
-                delay=0.00000001,
+                delay=0.1,
                 color=color,
             )
             solution = maze_solve(maze, config)
@@ -59,7 +59,7 @@ def main() -> None:
                     config,
                     solution,
                     animate=True,
-                    delay=0.01,
+                    delay=0.1,
                 )
                 vizualizer.visualize_cell_maze(
                     maze,
@@ -72,7 +72,7 @@ def main() -> None:
                     config,
                     solution,
                     animate=True,
-                    delay=0.01,
+                    delay=0.1,
                 )
                 vizualizer.visualize_cell_maze_different_color(
                     maze,

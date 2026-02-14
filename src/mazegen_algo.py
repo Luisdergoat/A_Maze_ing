@@ -372,8 +372,32 @@ def generat_maze(
             y,
         )
 
+        animated = False
+       
+        if x == -1:
+            if len(steps) > 0:
+                x, y = steps.pop()
+                # Aktualisiere Live-Visualisierung für jeden Move
+                if animate and animated is False:
+                    animated = True
+                    if color == "default":
+                        visualize_maze.update_live_visualization(
+                            maze,
+                            config,
+                            current_pos=(x, y),
+                        )
+                    elif color == "changed":
+                        visualize_maze.update_live_visualization_different_color(
+                            maze,
+                            config,
+                            current_pos=(x, y),
+                        )
+                time.sleep(delay)
+            else:
+                break
+
         # Aktualisiere Live-Visualisierung für jeden Move
-        if animate:
+        if animate and animated is False:
             if color == "default":
                 visualize_maze.update_live_visualization(
                     maze,
@@ -387,17 +411,8 @@ def generat_maze(
                     current_pos=(x, y),
                 )
             time.sleep(delay)
+        animated = False
 
-        # remove_wall_between(maze, last_cell, (x, y))
-        # muss hier gemacht werden
-        # try:
-        # except ValueError:
-        #     pass
-        if x == -1:
-            if len(steps) > 0:
-                x, y = steps.pop()
-            else:
-                break
     if not perfect_maze:
         remove_extra_walls(maze, config)
 

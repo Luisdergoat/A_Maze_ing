@@ -77,10 +77,9 @@ class ExitOnKey(Effect):
         pass
 
     def process_event(self, event):
-        if isinstance(event, KeyboardEvent):
-            if event.key_code in (ord('1'), ord('2'), ord('3'), ord('4'), ord('5')):
-                self.key = event.key_code
-                raise StopApplication("key pressed")
+        if event.key_code in (ord('1'), ord('2'), ord('3'), ord('4'), ord('5')):
+            self.key = event.key_code
+            raise StopApplication("key pressed")
         return event
 
     @property
