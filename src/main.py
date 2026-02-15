@@ -5,6 +5,9 @@ Docstring for main
 from __future__ import annotations
 
 import os
+import sys
+import termios
+import tty
 from typing import Dict, List, Optional, Tuple, Union
 
 from cell import Cell
@@ -22,6 +25,21 @@ Config = Dict[str, ConfigValue]
 Maze = List[List[Cell]]
 
 
+def wait_for_keypress(prompt: str = "Press any key to return...") -> None:
+    if prompt:
+        print(prompt, end="", flush=True)
+    if not sys.stdin.isatty():
+        input()
+        return
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
 def main() -> None:
     os.system("clear")  # clear before intro animation
     play_intro()  # Optional: Intro Animation fuer den WoW Effect in der eval
@@ -36,6 +54,7 @@ def main() -> None:
             option = int(chr(option))
         except (ValueError, TypeError):
             option = None
+
         if option == 1:
             os.system("clear")
             if result is None:
@@ -47,7 +66,7 @@ def main() -> None:
                 maze,
                 config,
                 animate=True,
-                delay=0.1,
+                delay=0.001,
                 color=color,
             )
             solution = maze_solve(maze, config)
@@ -72,7 +91,7 @@ def main() -> None:
                     config,
                     solution,
                     animate=True,
-                    delay=0.1,
+                    delay=0.001,
                 )
                 vizualizer.visualize_cell_maze_different_color(
                     maze,
@@ -80,10 +99,11 @@ def main() -> None:
                     clear_screen=True,
                 )
             generate_output_file(maze, config, solution)
-            input()
+            wait_for_keypress()
         elif option == 2:
             os.system("nvim config.txt")
             continue
+
         elif option == 3:
             if color == "default":
                 color = "changed"
@@ -110,15 +130,18 @@ def main() -> None:
                         font="big"
                     )
                 )
-            continue
+            wait_for_keypress()
+
         elif option == 4:
             os.system("clear")
             print(figlet_format("Try Again!", font="slant"))
             return
+
         elif option == 5:
             os.system("clear")
             os.system("make fclean")
             return
+
         else:
             os.system("clear")
             print("Enter a valid number, not:", option)

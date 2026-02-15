@@ -67,7 +67,6 @@ class ColorStars(Effect):
         return 0
 
 
-
 class ExitOnKey(Effect):
     def __init__(self, screen):
         super().__init__(screen)
@@ -142,7 +141,7 @@ def _options(screen: Screen) -> int | None:
     except StopApplication:
         pass
     return exit_effect.key
-    
+
 
 def play_option_menu() -> None:
     while True:
