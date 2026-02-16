@@ -107,7 +107,7 @@ def check_walls(
     # Check North: y-1
     if y > 1:  # y > 1 to avoid frame at y=0
         cell = maze[y - 1][x]
-        if not cell.frame:  # type: ignore
+        if not cell.frame:
             is_move_valid["N"] = True
     # Check South: y+1
     height_val = _require_int(config, "HEIGHT")

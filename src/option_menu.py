@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import os
 from random import choice, randint
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Event
 
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
@@ -67,14 +67,14 @@ class ColorStars(Effect):
 
 
 class ExitOnKey(Effect):
-    def __init__(self, screen):
+    def __init__(self, screen: int) -> None:
         super().__init__(screen)
         self.key = None
 
-    def _update(self, frame_no):
+    def _update(self, frame_no: int) -> None:
         pass
 
-    def process_event(self, event):
+    def process_event(self, event: Event) -> Event:
         if event.key_code in (ord('1'),
                               ord('2'), ord('3'), ord('4'), ord('5')):
             self.key = event.key_code
@@ -82,10 +82,10 @@ class ExitOnKey(Effect):
         return event
 
     @property
-    def stop_frame(self):
+    def stop_frame(self) -> int:
         return 0
 
-    def reset(self):
+    def reset(self) -> None:
         pass
 
 
