@@ -373,7 +373,7 @@ def generat_maze(
         )
 
         animated = False
-       
+
         if x == -1:
             if len(steps) > 0:
                 x, y = steps.pop()
