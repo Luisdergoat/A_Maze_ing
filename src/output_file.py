@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Sequence, Tuple, Union
+from typing import Dict, Sequence, Tuple, Union, List
 
 from cell import Cell
 
@@ -36,7 +36,9 @@ def generate_output_file(
         f.write(f"{entry_x},{entry_y}\n")
         f.write(f"{exit_x},{exit_y}\n")
         x = 0
+        ix = 0
         y = 0
+        iy = 0
         tup = tuple()
         for tup in solution:
             if x != 0 and y != 0 and ix != 0 and iy != 0:
