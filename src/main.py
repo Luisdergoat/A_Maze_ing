@@ -91,7 +91,7 @@ def main() -> None:
                     config,
                     solution,
                     animate=True,
-                    delay=0.001,
+                    delay=0.1,
                 )
                 vizualizer.visualize_cell_maze_different_color(
                     maze,
