@@ -126,7 +126,7 @@ def main() -> None:
                 os.system("clear")
                 print(
                     figlet_format(
-                        "Generate a maze first to change the color",
+                        "Generate a maze first to see it",
                         font="big"
                     )
                 )

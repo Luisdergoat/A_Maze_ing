@@ -387,7 +387,7 @@ def generat_maze(
                             current_pos=(x, y),
                         )
                     elif color == "changed":
-                        visualize_maze.update_live_visualization_different_color(
+                        visualize_maze.update_live_visualization_diff_color(
                             maze,
                             config,
                             current_pos=(x, y),
@@ -405,7 +405,7 @@ def generat_maze(
                     current_pos=(x, y),
                 )
             elif color == "changed":
-                visualize_maze.update_live_visualization_different_color(
+                visualize_maze.update_live_visualization_diff_color(
                     maze,
                     config,
                     current_pos=(x, y),

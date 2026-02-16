@@ -230,7 +230,7 @@ def stop_live_visualization() -> None:
         _live_display = None
 
 
-def update_live_visualization_different_color(
+def update_live_visualization_diff_color(
     cell_maze: CellMaze,
     config: ConfigMapping,
     current_pos: Optional[Tuple[int, int]] = None,

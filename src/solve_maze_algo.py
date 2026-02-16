@@ -153,7 +153,7 @@ def different_color(
             maze[y][x].mark_need_to_solve()
 
             if animate:
-                vis.update_live_visualization_different_color(maze, config)
+                vis.update_live_visualization_diff_color(maze, config)
                 time.sleep(delay)
 
         if animate:

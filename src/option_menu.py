@@ -6,14 +6,13 @@ from __future__ import annotations
 
 import os
 from random import choice, randint
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
 from asciimatics.effects import Effect, Print
 from asciimatics.renderers import FigletText, StaticRenderer
 from asciimatics.exceptions import StopApplication, ResizeScreenError
-from asciimatics.event import KeyboardEvent
 
 
 class ColorStars(Effect):
@@ -76,7 +75,8 @@ class ExitOnKey(Effect):
         pass
 
     def process_event(self, event):
-        if event.key_code in (ord('1'), ord('2'), ord('3'), ord('4'), ord('5')):
+        if event.key_code in (ord('1'),
+                              ord('2'), ord('3'), ord('4'), ord('5')):
             self.key = event.key_code
             raise StopApplication("key pressed")
         return event
@@ -151,6 +151,8 @@ def play_option_menu() -> None:
             continue
         except StopApplication:
             break
+        except AttributeError:
+            pass
 
 
 if __name__ == "__main__":
