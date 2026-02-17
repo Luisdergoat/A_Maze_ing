@@ -3,7 +3,7 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lunsold <your@email.com>                  +#+  +:+       +#+         #
+#    By: lunsold <your@email.com>                  +#+  +:+       +#+          #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 00:00:00 by lunsold           #+#    #+#              #
 #    Updated: 2026/02/10 00:00:00 by lunsold          ###   ########.fr        #

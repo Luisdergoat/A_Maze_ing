@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import os
 from random import choice, randint
-from typing import Any, Dict, List, Event
+from typing import Any, Dict, List
 
 from asciimatics.screen import Screen
 from asciimatics.scene import Scene
@@ -74,7 +74,7 @@ class ExitOnKey(Effect):
     def _update(self, frame_no: int) -> None:
         pass
 
-    def process_event(self, event: Event) -> Event:
+    def process_event(self, event):
         if event.key_code in (ord('1'),
                               ord('2'), ord('3'), ord('4'), ord('5')):
             self.key = event.key_code
