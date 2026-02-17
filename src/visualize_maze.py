@@ -312,7 +312,7 @@ def convert_cells_to_maze_array(
 
 def visualize_cell_maze(
     cell_maze: CellMaze,
-    config: ConfigMapping,
+    config: ConfigMapping | None,
     clear_screen: bool = False,
     show_config: bool = True,
     show_table: bool = True,
@@ -391,7 +391,7 @@ def visualize_cell_maze(
 
 def visualize_cell_maze_different_color(
     cell_maze: CellMaze,
-    config: ConfigMapping,
+    config: ConfigMapping | None,
     clear_screen: bool = False,
     show_config: bool = True,
     show_table: bool = True,

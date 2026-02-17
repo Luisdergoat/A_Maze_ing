@@ -49,11 +49,11 @@ def main() -> None:
     config: Optional[Config] = None
     while True:
         result = mazeparser.parse_maze_config()
-        option = play_option_menu()
+        option: int = play_option_menu()
         try:
             option = int(chr(option))
         except (ValueError, TypeError):
-            option = None
+            option = 0
 
         if option == 1:
             os.system("clear")

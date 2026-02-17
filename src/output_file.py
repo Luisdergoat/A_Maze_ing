@@ -13,7 +13,7 @@ Config = Dict[str, ConfigValue]
 def generate_output_file(
     maze: Sequence[Sequence[Cell]],
     config: Config,
-    solution: List[Tuple[int, int]]
+    solution: List[Tuple[int, int]] | None
 ) -> None:
     """generate the output_maze.txt"""
     entry_tuple = config["ENTRY"]
@@ -39,18 +39,19 @@ def generate_output_file(
         ix = 0
         y = 0
         iy = 0
-        tup: Tuple[int] = tuple()
-        for tup in solution:
-            if x != 0 and y != 0 and ix != 0 and iy != 0:
-                if y < iy:
-                    f.write("N")
-                if y > iy:
-                    f.write("S")
-                if x > ix:
-                    f.write("E")
-                if x < ix:
-                    f.write("W")
-            ix = x
-            iy = y
-            x, y = tup
+        tup: tuple[int, int] = (0, 0)
+        if solution is not None:
+            for tup in solution:
+                if x != 0 and y != 0 and ix != 0 and iy != 0:
+                    if y < iy:
+                        f.write("N")
+                    if y > iy:
+                        f.write("S")
+                    if x > ix:
+                        f.write("E")
+                    if x < ix:
+                        f.write("W")
+                ix = x
+                iy = y
+                x, y = tup
         f.write("\n")

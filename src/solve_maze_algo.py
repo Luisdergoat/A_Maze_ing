@@ -88,12 +88,12 @@ def maze_solve(
         return None  # Kein Pfad gefunden
 
     path = []
-    current = (exit_x, exit_y)
+    current: Tuple[int, int] = (exit_x, exit_y)
 
     path.append(current)
     while current != (start_x, start_y):
         path.append(current)
-        current = parent_map.get(current)
+        current = parent_map.get(current)  # type: ignore
 
     path.append((start_x, start_y))
     path.reverse()

@@ -15,7 +15,7 @@ from asciimatics.renderers import FigletText, StaticRenderer
 from asciimatics.exceptions import StopApplication, ResizeScreenError
 
 
-class ColorStars(Effect):
+class ColorStars(Effect):  # type: ignore[misc]
     def __init__(
         self,
         screen: Screen,
@@ -66,7 +66,7 @@ class ColorStars(Effect):
         return 0
 
 
-class ExitOnKey(Effect):
+class ExitOnKey(Effect):  # type: ignore[misc]
     def __init__(self, screen: int) -> None:
         super().__init__(screen)
         self.key = None
@@ -74,7 +74,7 @@ class ExitOnKey(Effect):
     def _update(self, frame_no: int) -> None:
         pass
 
-    def process_event(self, event):
+    def process_event(self, event: Any) -> Any:
         if event.key_code in (ord('1'),
                               ord('2'), ord('3'), ord('4'), ord('5')):
             self.key = event.key_code
@@ -143,7 +143,7 @@ def _options(screen: Screen) -> int | None:
     return exit_effect.key
 
 
-def play_option_menu() -> None:
+def play_option_menu() -> Any:
     while True:
         try:
             return Screen.wrapper(_options)

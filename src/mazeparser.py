@@ -51,7 +51,7 @@ def read_out_config(
                 if "=" not in line:
                     continue  # Skip lines without '='
 
-                value: str = None
+                value: str | int | bool | None | tuple[int, int] = None
                 key, value = line.split("=", 1)
                 if value.isdigit():
                     config[key] = int(value)
