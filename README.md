@@ -1,373 +1,125 @@
-## This project has been created as part of the 42 curriculum by lunsold and jdreissi
+*This project has been created as part of the 42 curriculum by lunsold and jdreissi.*
 
 # A_Maze_ing
-
-![42 Badge](https://img.shields.io/badge/42-Project-blue) ![Language](https://img.shields.io/badge/Language-Python-orange) ![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
-
-Ein vollständiges Python-Projekt zur **Generierung, Visualisierung und Lösung von Labyrinthen** basierend auf Konfigurationsdateien mit optionalem 42-Pattern.
+A Python maze generator, terminal visualizer, and solver driven by a simple `config.txt`.
 
 ---
 
-## 📋 Projektübersicht
+## Description
+**A_Maze_ing** generates mazes from a configuration file, renders them in the terminal (using `rich`), and can automatically solve them from **ENTRY** to **EXIT**.
 
-A_Maze_ing ist ein ausgereiftes Labyrinth-Generierungstool, das Labyrinthe basierend auf einer `config.txt` Datei erstellt, visualisiert und automatisch löst. Das Projekt nutzt einen rekursiven Backtracking-Algorithmus zur Generierung und bietet eine hochwertige Terminal-Visualisierung mit der `rich`-Library.
-
----
-
-## ✨ Features
-
-### ✅ Vollständig implementiert
-
-- **🎯 Maze-Generierung**
-  - Rekursiver Backtracking-Algorithmus
-  - Perfekte und unperfekte Labyrinthe (PERFECT-Flag)
-  - Optionales 42-Pattern für die Projektnummer
-  - Seed-basierte Generierung für reproduzierbare Ergebnisse
-
-- **🖼️ Visualisierung**
-  - Terminal-basierte Live-Visualisierung mit `rich`
-  - Bit-basierte Wanddarstellung (4-Bit System)
-  - Farbcodierte Elemente (Entry, Exit, Wände, Pfade)
-  - Optionale Animation während der Generierung
-  - Zwei Visualizer (Standard + New Visualizer)
-
-- **🧭 Maze-Solving**
-  - Automatischer Pathfinding-Algorithmus
-  - Visualisierung des Lösungswegs
-  - Markierung besuchter Zellen
-
-- **📄 Dateiausgabe**
-  - Exportiert Labyrinth als `maze.txt` in hexadezimalem Format
-  - Enthält Entry/Exit-Koordinaten
-
-- **🔧 Build-System**
-  - Vollständiges Makefile mit Zielsteuerung
-  - Automatische Virtual Environment-Verwaltung
-  - Dependency-Management
+**Goal:** build a configurable maze tool with clear output, reproducibility (seeds), and optional “perfect” mazes (single-solution) vs. imperfect mazes (multiple paths).
 
 ---
 
-## 🏗️ Projektstruktur
+## Instructions
 
-```
-A_Maze_ing/
-├── Makefile                    # Build-System mit install, run, clean
-├── README.md                   # Diese Datei
-├── config.txt                  # Konfigurationsdatei für Labyrinth-Parameter
-├── requirements.txt            # Python-Dependencies (auto-generiert)
-└── src/
-    ├── main.py                 # ✅ Hauptprogramm mit CLI-Menü
-    ├── cell.py                 # ✅ Cell-Klasse für Labyrinth-Zellen
-    ├── mazeparser.py           # ✅ Config-Parser und Validierung
-    ├── mazegen_algo.py         # ✅ Maze-Generierungsalgorithmus
-    ├── solve_maze_algo.py      # ✅ Maze-Solving-Algorithmus
-    ├── visualize_maze.py       # ✅ Rich-basierte Maze-Visualisierung
-    ├── new_maze_visualizer.py  # ✅ Alternativer Visualizer
-    └── output_file.py          # ✅ Dateiausgabe-Generator
-```
+### Requirements
+- Python 3
+- `make` (recommended)
 
----
-
-## 🚀 Installation & Verwendung
-
-### Installation
-
+### Install
 ```bash
-# Repository klonen
 git clone https://github.com/Luisdergoat/A_Maze_ing.git
 cd A_Maze_ing
-
-# Dependencies installieren (erstellt automatisch Virtual Environment)
 make install
 ```
 
-### Programm ausführen
-
+### Run
 ```bash
-# Maze-Generator starten
 make run
 ```
 
-### Manuelle Ausführung
-
-```bash
-# Virtual Environment aktivieren
-source venv/bin/activate
-
-# Programm starten
-python3 src/main.py
-```
-
 ---
 
-## 🎮 Interaktives CLI-Menü
+## Config file (complete structure & format)
+The project is configured via a **root-level** `config.txt` using `KEY=VALUE` pairs:
 
-Nach dem Start bietet das Programm folgende Optionen:
-
-```
-Choose one of the options:
-1: generate Maze       - Generiert und löst ein neues Labyrinth
-2: edit config         - Öffnet config.txt in nvim zum Bearbeiten
-3: change colour       - Farbschema ändern (experimentell)
-4: exit                - Programm beenden
-5: exit with cleanup   - Beenden + generierte Dateien löschen (make fclean)
-```
-
----
-
-## 📝 Config-Datei Format
-
-Die `config.txt` definiert alle Parameter für die Labyrinth-Generierung:
-
-```text name=config.txt url=https://github.com/Luisdergoat/A_Maze_ing/blob/main/config.txt
-# Maze Configuration 
-WIDTH=15
-HEIGHT=22
-ENTRY=0, 0
-EXIT=14, 21
+```text
+# Maze Configuration
+WIDTH=20
+HEIGHT=15
+ENTRY=3, 2
+EXIT=7, 13
 OUTPUT_FILE=maze.txt
 PERFECT=False
 42PATTERN=True
 SEED=random
 ```
 
-### Parameter-Beschreibung
-
-| Parameter | Typ | Beschreibung |
-|-----------|-----|--------------|
-| **WIDTH** | Integer | Breite des Labyrinths (min. 3) |
-| **HEIGHT** | Integer | Höhe des Labyrinths (min. 3) |
-| **ENTRY** | Tuple | Startpunkt (x,y) |
-| **EXIT** | Tuple | Ausgangspunkt (x,y) |
-| **OUTPUT_FILE** | String | Name der generierten Ausgabedatei |
-| **PERFECT** | Boolean | `True` = ein Lösungsweg, `False` = mehrere Wege möglich |
-| **42PATTERN** | Boolean | `True` = Fügt 42-Pattern ein |
-| **SEED** | String/Integer | `random` oder fester Seed für Reproduzierbarkeit |
+**Fields**
+- `WIDTH` (int): maze width
+- `HEIGHT` (int): maze height
+- `ENTRY` (`x, y`): start coordinate
+- `EXIT` (`x, y`): end coordinate
+- `OUTPUT_FILE` (string): output filename (e.g. `maze.txt`)
+- `PERFECT` (bool): `True` = perfect maze (unique path), `False` = imperfect (can contain multiple paths)
+- `42PATTERN` (bool): enables the optional “42” pattern feature
+- `SEED` (int or `random`): fixed seed for reproducibility or random generation
 
 ---
 
-## 🛠️ Technologie-Stack
+## Maze generation algorithm
+**Chosen algorithm:** *Recursive Backtracking* (Depth-First carving, implemented with a stack).
 
-- **Python 3.x**
-- **rich** >= 13.0.0 - Terminal-UI und Visualisierung
-- **pytest** >= 7.0.0 - Testing (vorbereitet)
-
----
-
-## 🧩 Modulbeschreibungen
-
-### `cell.py` - Cell-Klasse
-
-Repräsentiert eine einzelne Zelle im Labyrinth.
-
-**Attribute:**
-- `x, y` - Koordinaten
-- `wall` - 4-Bit-Integer für Wände (Bit 0-3: West, Süd, Ost, Nord)
-- `visited` - Besuchsstatus während Generierung
-- `frame` - Markierung für Rahmen-Zellen
-- `solve_need` - Flag für Lösungsweg
-
-**Wanddarstellung:**
-```
-Bit 3 (8): Nord  ↑
-Bit 2 (4): Ost   →
-Bit 1 (2): Süd   ↓
-Bit 0 (1): West  ←
-
-Beispiele:
-15 (1111) = Alle Wände geschlossen
-0  (0000) = Alle Wände offen
-10 (1010) = Nord und Süd geschlossen
-```
-
-### `mazeparser.py` - Configuration Parser
-
-Liest und validiert die `config.txt`:
-- Parst Key-Value-Paare
-- Konvertiert Datentypen (int, bool, tuple)
-- Validiert Koordinaten innerhalb der Grenzen
-- Prüft Mindestgröße (3x3)
-
-### `mazegen_algo.py` - Maze-Generator
-
-Implementiert den Labyrinth-Generierungsalgorithmus:
-- **Algorithmus:** Recursive Backtracking mit Stack
-- **Funktionen:**
-  - `check_moves()` - Prüft gültige Bewegungen
-  - `check_walls()` - Wall-Validierung
-  - `generat_maze()` - Hauptgenerierungsfunktion
-- **Features:** Live-Animation, Frame-Handling, 42-Pattern-Integration
-
-### `solve_maze_algo.py` - Maze-Solver
-
-Löst das generierte Labyrinth:
-- **Algorithmus:** Depth-First Search (DFS) mit Stack
-- **Funktionen:**
-  - `check_valid_moves()` - Findet mögliche Bewegungen basierend auf Bit-Masken
-  - `maze_solve()` - Findet Pfad von Entry zu Exit
-  - `maze_visualization()` - Visualisiert den Lösungsweg
-
-### `visualize_maze.py` - Rich-Visualizer
-
-Hochwertige Terminal-Visualisierung:
-- Nutzt `rich`-Library für farbige Ausgabe
-- Live-Update während Generierung und Lösung
-- Zeigt Entry (grün), Exit (rot), Pfade und Wände
-- Refresh-Rate: 120 FPS
-
-### `output_file.py` - File Export
-
-Generiert `maze.txt` mit:
-- Hexadezimale Wandkodierung (ein Zeichen pro Zelle)
-- Entry/Exit-Koordinaten am Dateiende
-
-**Beispiel-Output:**
-```
-ffffff...
-f0a3b...
-...
-0,0
-14,21
-```
+### Why this algorithm
+- Produces classic “perfect maze” structure naturally (when `PERFECT=True`)
+- Simple to implement, debug, and extend
+- Fast and works well for many maze sizes
+- Easy to animate step-by-step in a terminal UI
 
 ---
 
-## 📊 Makefile-Targets
-
-| Target | Beschreibung |
-|--------|--------------|
-| `make all` | Alias für `make run` |
-| `make install` | Erstellt venv und installiert Dependencies |
-| `make run` | Startet das Programm |
-| `make clean` | Löscht generierte Dateien (maze.txt, etc.) |
-| `make fclean` | Clean + löscht venv |
-| `make re` | Rebuild (fclean + all) |
+## Reusable parts (what & how)
+- **Parsing/validation** (`src/mazeparser.py`): can be reused for any key-value config-driven tool.
+- **Grid/cell representation** (`src/cell.py`): reusable cell model with compact wall encoding (bitmask).
+- **Generation & solving logic** (`src/mazegen_algo.py`, `src/solve_maze_algo.py`): algorithms are modular and can be swapped/extended with additional strategies.
+- **Visualization layer** (`src/visualize_maze.py`, `src/new_maze_visualizer.py`): can be reused to render other grid-based problems.
+- **Export** (`src/output_file.py`): reusable exporter for grid data + metadata (entry/exit).
 
 ---
 
-## 🎨 Visualisierungs-Modi
+## Team & project management
 
-### Standard-Modus (ohne Animation)
-```python
-generat_maze(maze, config, animate=False)
-```
+### Team roles
+- **jdreissi**: algorithm work (solver), core integration, config-driven workflow, CLI/menu,  build tooling (Makefile), overall structure
+- **lunsold**: algorithm work (solver), visualization, testing/cleanup & refactoring (adapt as needed)
 
-### Animations-Modus
-```python
-generat_maze(maze, config, animate=True, delay=0.01)
-```
+### Planning (expected → actual)
+- **Planned:** config parser → generator → visualizer → solver → exporter → polish
+- **Evolved:** additional visualization mode(s), optional features (perfect/imperfect, pattern, seed control), improved UX via Makefile + venv automation
 
-### Solving-Visualisierung
-```python
-maze_visualization(maze, config, solution, animate=True, delay=0.01)
-```
+### What worked well
+- Clear separation of responsibilities (parse / generate / solve / render / export)
+- Config-driven workflow simplified testing many maze variants quickly
+- Seed support made debugging reproducible
 
----
-
-## 🧪 Beispiel-Workflow
-
-1. **Config anpassen:**
-   ```bash
-   nvim config.txt  # oder Option 2 im Menü
-   ```
-
-2. **Maze generieren:**
-   ```bash
-   make run
-   # Dann Option 1 wählen
-   ```
-
-3. **Output prüfen:**
-   - Terminal: Live-Visualisierung
-   - Datei: `maze.txt` (hexadezimale Repräsentation)
-
-4. **Cleanup:**
-   ```bash
-   make clean   # Nur generierte Dateien
-   make fclean  # Alles inkl. venv
-   ```
+### Tools used
+- **Makefile** for install/run/clean workflows
+- **Python venv** for dependency isolation
+- **rich** for terminal rendering
 
 ---
 
-## 🔍 Algorithmus-Details
-
-### Maze-Generierung (Recursive Backtracking)
-
-1. Starte bei zufälliger Zelle
-2. Markiere aktuelle Zelle als besucht
-3. Wähle zufällige unbesuchte Nachbarzelle
-4. Entferne Wand zwischen aktueller und gewählter Zelle
-5. Rekursiv auf neue Zelle
-6. Bei Sackgasse: Backtrack zum letzten Fork
-
-### Maze-Solving (DFS)
-
-1. Starte bei ENTRY-Koordinaten
-2. Prüfe verfügbare Bewegungen (keine Wand, nicht besucht)
-3. Stack-basierte Exploration
-4. Markiere Pfad bis EXIT erreicht
-5. Visualisiere Lösungsweg
+## Advanced / optional features (if enabled)
+- Perfect vs. imperfect mazes (`PERFECT`)
+- Seed-based reproducibility (`SEED`)
+- Optional 42-pattern insertion (`42PATTERN`)
+- Multiple visualization approaches (standard + alternative visualizer)
 
 ---
 
-## 🤝 Contributing
+## Resources
+**Maze generation & pathfinding**
+- Recursive backtracker (maze generation): https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+- Depth-first search (DFS): https://en.wikipedia.org/wiki/Depth-first_search
 
-Contributions sind willkommen! 
+**Python & terminal UI**
+- Rich documentation: https://rich.readthedocs.io/
+- Python venv: https://docs.python.org/3/library/venv.html
 
-**Entwickelt von:**
-- [@Luisdergoat](https://github.com/Luisdergoat) (lunsold)
-- jdreissi
-
-**Pull Requests:** Gerne für Verbesserungen und neue Features.
-
----
-
-## 📄 Lizenz
-
-Noch nicht festgelegt - Teil des 42 Curriculum.
-
----
-
-## 🐛 Bekannte Limitationen
-
-- Option 3 (change colour) ist noch experimentell
-- `new_maze_visualizer.py` ist in Entwicklung (nicht voll integriert)
-- Testing-Framework vorbereitet, aber Tests noch nicht implementiert
-
----
-
-## 💡 Tipps & Tricks
-
-### Sehr große Labyrinthe generieren
-```text
-WIDTH=100
-HEIGHT=100
-PERFECT=True
-SEED=42  # Für Reproduzierbarkeit
-```
-
-### Schnelle Generierung ohne Animation
-Im Code (main.py):
-```python
-generat_maze(maze, config, animate=False)
-maze_visualization(maze, config, solution, animate=False)
-```
-
-### Custom Seeds für reproduzierbare Labyrinthe
-```text
-SEED=12345  # Statt "random"
-```
-
----
-
-## 📚 Weiterführende Informationen
-
-**Algorithmen:**
-- [Recursive Backtracking (Wikipedia)](https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker)
-- [Depth-First Search (Wikipedia)](https://en.wikipedia.org/wiki/Depth-first_search)
-
-**Libraries:**
-- [Rich Documentation](https://rich.readthedocs.io/)
-- [Python venv](https://docs.python.org/3/library/venv.html)
-
----
+### AI usage (required disclosure)
+AI was used for:
+- README structure and wording (clarity, formatting, and completeness)
+- Summarizing the project’s modules and explaining the algorithms in concise documentation form  
+AI was **not** used to generate or modify the repository’s source code in this step.
