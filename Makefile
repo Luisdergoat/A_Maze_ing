@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lunsold <your@email.com>                  +#+  +:+       +#+          #
+#    By: jdreissi <jdreissi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 00:00:00 by lunsold           #+#    #+#              #
-#    Updated: 2026/02/10 00:00:00 by lunsold          ###   ########.fr        #
+#    Updated: 2026/03/02 19:24:01 by jdreissi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,16 +20,18 @@ RESET	= \033[0m
 # ================================ VARIABLES =============================== #
 VENV		= venv
 PYTHON		= $(VENV)/bin/python3
+DEGUGG_MODE	= $(VENV)/bin/python3 -m pdb
 PIP			= $(VENV)/bin/pip
 ACTIVATE	= source $(VENV)/bin/activate
 
+lint1		= flake8 .
+lint2		= mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 SRC_DIR		= src
-CONFIG		= config.txt
 OUTPUT		= maze.txt
 MAZE_TXT	= $(SRC_DIR)/maze.txt
 
 # Python files
-MAIN		= $(SRC_DIR)/main.py
+MAIN		= a_maze_ing.py
 
 # ================================ TARGETS ================================= #
 
@@ -56,21 +58,15 @@ requirements.txt:
 	@echo "$(GREEN)✅ requirements.txt created!$(RESET)"
 	@echo "$(GREEN)✅ richui, pytest, neovim, and pyfiglet installed successfully!$(RESET)"
 # Create config.txt if it doesn't exist
-$(CONFIG):
-	@echo "$(YELLOW)⚠️  config.txt not found. Creating default...$(RESET)"
-	@echo "WIDTH=15" > $(CONFIG)
-	@echo "HEIGHT=15" >> $(CONFIG)
-	@echo "ENTRY=0,0" >> $(CONFIG)
-	@echo "EXIT=14,14" >> $(CONFIG)
-	@echo "PERFECT=True" >> $(CONFIG)
-	@echo "SEED=42" >> $(CONFIG)
-	@echo "OUTPUT_FILE=output_maze.txt" >> $(CONFIG)
-	@echo "$(GREEN)✅ Default config.txt created!$(RESET)"
 
 # Run maze generation
 run: install $(CONFIG)
 	@echo "$(BLUE)🎮 Running maze generator...$(RESET)"
-	@$(PYTHON) $(MAIN)
+	@PYTHONPATH=$(SRC_DIR) $(PYTHON) $(MAIN)
+
+debug: install 
+	echo
+	$(DEGUGG_MODE) a_maze_ing.py
 
 # Clean generated files
 clean:
@@ -92,6 +88,13 @@ fclean: clean
  
 # Reinstall everything
 re: fclean all
+
+# check the code with flake8 and mypy
+lint:
+	@echo "$(BLUE)🔍 Running linters...$(RESET)"
+	@$(lint1)
+	@$(lint2)
+	@echo "$(GREEN)✅ Linting complete!$(RESET)"
 
 # Show help
 help:

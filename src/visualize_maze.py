@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import List, Mapping, Optional, Sequence, Tuple, Union
 
-from cell import Cell
+from mazegen.cell import Cell
 import mazeparser
 from rich import box
 from rich.console import Console

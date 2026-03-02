@@ -20,7 +20,7 @@ def _quit_on_input(event: Optional[object]) -> None:
         raise StopApplication("Intro finished")
 
 
-class ColorStars(Effect):  # type: ignore[misc]
+class ColorStars(Effect):
     def __init__(
         self,
         screen: Screen,

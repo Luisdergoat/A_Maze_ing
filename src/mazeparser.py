@@ -7,9 +7,10 @@ und in ein maze umgewandelt.
 from __future__ import annotations
 
 import os
+import sys
 from typing import Dict, List, Optional, Tuple, Union
 
-from cell import Cell
+from mazegen.cell import Cell
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]
@@ -126,8 +127,11 @@ def parse_maze_config() -> Optional[Tuple[List[List[Cell]], Config]]:
     """
 
     project_root = os.path.dirname(os.path.dirname(__file__))
-    config_path = os.path.join(project_root, "config.txt")
-    config = read_out_config(config_path)
+    try:
+        config_path = os.path.join(project_root, sys.argv[1])
+        config = read_out_config(config_path)
+    except Exception:
+        return None
     if config is None:
         return None
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, Sequence, Tuple, Union, List
 
-from cell import Cell
+from mazegen.cell import Cell
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]

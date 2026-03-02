@@ -33,6 +33,25 @@ make install
 make run
 ```
 
+## Reusable module package (`mazegen-*`)
+The reusable Python module is packaged as `mazegen-*` and build artifacts must be
+generated at the repository root.
+
+Allowed artifact formats:
+- `mazegen-<version>-py3-none-any.whl`
+- `mazegen-<version>.tar.gz`
+
+Build from sources:
+```bash
+python -m pip install --upgrade pip build setuptools wheel
+python -m build
+```
+
+Install generated package (example):
+```bash
+python -m pip install dist/mazegen-1.0.0-py3-none-any.whl
+```
+
 ## Remove venv
 ```bash
 make fclean

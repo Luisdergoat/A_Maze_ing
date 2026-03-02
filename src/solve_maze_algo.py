@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
-from cell import Cell
+from mazegen.cell import Cell
 import visualize_maze as vis
 from collections import deque
 

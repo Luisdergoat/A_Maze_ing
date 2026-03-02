@@ -8,8 +8,12 @@ from __future__ import annotations
 import random
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
-from cell import Cell
-import visualize_maze
+from .cell import Cell
+
+try:
+    import visualize_maze
+except ImportError:
+    visualize_maze = None
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]
@@ -307,6 +311,12 @@ def generat_maze(
     :param delay: Verzögerung zwischen Frames (Sekunden)
     """
     import time
+
+    if animate and visualize_maze is None:
+        raise ImportError(
+            "animate=True requires module 'visualize_maze' to be installed "
+            "or available on PYTHONPATH"
+        )
 
     #  macht das maze und erstellt den weg halt ha
     # Config coordinates are without frame, so add +1 offset

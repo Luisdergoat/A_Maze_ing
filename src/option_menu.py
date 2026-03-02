@@ -15,7 +15,7 @@ from asciimatics.renderers import FigletText, StaticRenderer
 from asciimatics.exceptions import StopApplication, ResizeScreenError
 
 
-class ColorStars(Effect):  # type: ignore[misc]
+class ColorStars(Effect):
     def __init__(
         self,
         screen: Screen,
@@ -66,7 +66,7 @@ class ColorStars(Effect):  # type: ignore[misc]
         return 0
 
 
-class ExitOnKey(Effect):  # type: ignore[misc]
+class ExitOnKey(Effect):
     def __init__(self, screen: int) -> None:
         super().__init__(screen)
         self.key = None

@@ -10,11 +10,11 @@ import termios
 import tty
 from typing import Dict, List, Optional, Tuple, Union
 
-from cell import Cell
+from mazegen.cell import Cell
 from option_menu import play_option_menu
 from intro_animation import play_intro
 import mazeparser
-from mazegen_algo import generat_maze
+from mazegen.mazegen_algo import generat_maze
 from output_file import generate_output_file
 from pyfiglet import figlet_format
 from solve_maze_algo import different_color, maze_solve, maze_visualization
@@ -58,8 +58,8 @@ def main() -> None:
         if option == 1:
             os.system("clear")
             if result is None:
-                print("Config konnte nicht gelesen werden.")
-                continue
+                print("ERRROR: config not found.")
+                return
 
             maze, config = result
             generat_maze(
