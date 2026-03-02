@@ -1,9 +1,12 @@
 *This project has been created as part of the 42 curriculum by lunsold and jdreissi.*
 
 # A_Maze_ing
+![42 Badge](https://img.shields.io/badge/42-Project-blue)
+![Language](https://img.shields.io/badge/Language-python-orange)
+---
 A Python maze generator, terminal visualizer, and solver driven by a simple `config.txt`.
 
----
+
 
 ## Description
 **A_Maze_ing** generates mazes from a configuration file, renders them in the terminal (using `rich`), and can automatically solve them from **ENTRY** to **EXIT**.
@@ -16,7 +19,7 @@ A Python maze generator, terminal visualizer, and solver driven by a simple `con
 
 ### Requirements
 - Python 3
-- `make` (recommended)
+- `linux` (recommended)
 
 ### Install
 ```bash
@@ -30,6 +33,10 @@ make install
 make run
 ```
 
+## Remove venv
+```bash
+make fclean
+```
 ---
 
 ## Config file (complete structure & format)
@@ -82,7 +89,8 @@ SEED=random
 ## Team & project management
 
 ### Team roles
-- **jdreissi**: algorithm work (solver), core integration, config-driven workflow, CLI/menu,  build tooling (Makefile), overall structure
+- **jdreissi**: algorithm work (generate), core integration, config-driven workflow, CLI/menu,  build tooling (Makefile), overall structure
+
 - **lunsold**: algorithm work (solver), visualization, testing/cleanup & refactoring (adapt as needed)
 
 ### Planning (expected → actual)
@@ -98,6 +106,7 @@ SEED=random
 - **Makefile** for install/run/clean workflows
 - **Python venv** for dependency isolation
 - **rich** for terminal rendering
+- **asciimatics** for animated menu
 
 ---
 
@@ -117,8 +126,9 @@ SEED=random
 **Python & terminal UI**
 - Rich documentation: https://rich.readthedocs.io/
 - Python venv: https://docs.python.org/3/library/venv.html
+- Asciimatics: https://asciimatics.readthedocs.io/en/stable/widgets.html
 
-### AI usage (required disclosure)
+### AI usage
 AI was used for:
 - README structure and wording (clarity, formatting, and completeness)
 - Summarizing the project’s modules and explaining the algorithms in concise documentation form  
