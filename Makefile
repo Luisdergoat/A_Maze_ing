@@ -29,6 +29,7 @@ lint2		= mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports
 SRC_DIR		= src
 OUTPUT		= maze.txt
 MAZE_TXT	= $(SRC_DIR)/maze.txt
+ARGS		= $(wordlist 2, 999, $(MAKECMDGOALS))
 
 # Python files
 MAIN		= a_maze_ing.py
@@ -57,16 +58,16 @@ requirements.txt:
 	@echo "rich>=13.0.0\npytest>=7.0.0\nneovim>=0.3.1\npyfiglet>=0.8.post1\nasciimatics>=1.1.0" > requirements.txt
 	@echo "$(GREEN)✅ requirements.txt created!$(RESET)"
 	@echo "$(GREEN)✅ richui, pytest, neovim, and pyfiglet installed successfully!$(RESET)"
-# Create config.txt if it doesn't exist
 
 # Run maze generation
-run: install $(CONFIG)
+run: install
 	@echo "$(BLUE)🎮 Running maze generator...$(RESET)"
-	@PYTHONPATH=$(SRC_DIR) $(PYTHON) $(MAIN)
+	@PYTHONPATH=$(SRC_DIR) $(PYTHON) $(MAIN) $(ARGS)
 
 debug: install 
-	echo
-	$(DEGUGG_MODE) a_maze_ing.py
+	@echo "$(BLUE)🐞 Running in debug mode...$(RESET)"
+	$(DEGUGG_MODE) $(MAIN) $(ARGS)
+	@echo "$(GREEN)✅ Debugging session ended!$(RESET)"
 
 # Clean generated files
 clean:
@@ -90,7 +91,7 @@ fclean: clean
 re: fclean all
 
 # check the code with flake8 and mypy
-lint:
+lint: fclean
 	@echo "$(BLUE)🔍 Running linters...$(RESET)"
 	@$(lint1)
 	@$(lint2)
