@@ -10,6 +10,18 @@ ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]
 
 
+def reverse_first_4_bits(number: int) -> int:
+    """reverse the first 4 bits"""
+    binary_str = bin(number)[2:]
+    binary_str = binary_str.zfill(4)
+    first_4_bits = binary_str[:4]
+    reversed_4_bits = first_4_bits[::-1]
+    modified_binary_str = reversed_4_bits + binary_str[4:]
+    reversed_number = int(modified_binary_str, 2)
+
+    return reversed_number
+
+
 def generate_output_file(
     maze: Sequence[Sequence[Cell]],
     config: Config,
@@ -30,7 +42,7 @@ def generate_output_file(
     with open(output_file, "w", encoding="utf-8") as f:
         for row in maze[1:height_val + 1]:
             for cell in row[1:width_val + 1]:
-                f.write(f"{hex(cell.get_wall())[2:]}")
+                f.write(f"{hex(reverse_first_4_bits(cell.get_wall()))[2:]}")
             f.write("\n")
         f.write("\n")
         f.write(f"{entry_x},{entry_y}\n")

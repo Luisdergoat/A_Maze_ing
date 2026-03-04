@@ -58,8 +58,8 @@ def main() -> None:
         if option == 1:
             os.system("clear")
             if result is None:
-                print("ERRROR: config not found.")
-                return
+                print("CONFIG ERRROR")
+                continue
             maze, config = result
 
             generat_maze(
