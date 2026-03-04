@@ -276,6 +276,17 @@ def add_42_pattern(maze: Maze, config: Config) -> None:
     maze[mid_x - 2][mid_y + 1].mark_as_frame()
 
 
+def check_42(maze: Maze, config: Config) -> bool:
+    """checks if entry or exit is in 42 pattern"""
+    entry_x, entry_y = _require_tuple(config, "ENTRY")
+    exit_x, exit_y = _require_tuple(config, "EXIT")
+    if maze[exit_y + 1][exit_x + 1].frame is True:
+        return False
+    if maze[entry_y + 1][entry_x + 1].frame is True:
+        return False
+    return True
+
+
 def remove_extra_walls(maze: Maze, config: Config) -> None:
     """
     Docstring for remove_extra_walls
@@ -328,6 +339,13 @@ def generat_maze(
     maze[exit_y][exit_x].mark_visited()
     steps.append((x, y))
 
+    # add 42 pattern
+    if _require_bool(config, "42PATTERN") is True:
+        add_42_pattern(maze, config)
+
+    if check_42(maze, config) is False:
+        return
+
     # Start Live-Visualisierung
     if animate and color == "default":
         visualize_maze.start_live_visualization(
@@ -355,10 +373,6 @@ def generat_maze(
     else:
         seed_int = random.randint(-2147483648, 2147483647)
     random.seed(seed_int)
-
-    # add 42 pattern
-    if _require_bool(config, "42PATTERN") is True:
-        add_42_pattern(maze, config)
 
     exit_moves = check_moves(
         maze,

@@ -14,7 +14,7 @@ from mazegen.cell import Cell
 from option_menu import play_option_menu
 from intro_animation import play_intro
 import mazeparser
-from mazegen.mazegen_algo import generat_maze
+from mazegen.mazegen_algo import generat_maze, check_42
 from output_file import generate_output_file
 from pyfiglet import figlet_format
 from solve_maze_algo import different_color, maze_solve, maze_visualization
@@ -60,8 +60,8 @@ def main() -> None:
             if result is None:
                 print("ERRROR: config not found.")
                 return
-
             maze, config = result
+
             generat_maze(
                 maze,
                 config,
@@ -69,6 +69,12 @@ def main() -> None:
                 delay=0.001,
                 color=color,
             )
+
+            if check_42(maze, config) is False:
+                print("ERROR: entry or exit is in 42 pattern.")
+                wait_for_keypress()
+                continue
+
             solution = maze_solve(maze, config)
             os.system("clear")
 
