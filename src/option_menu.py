@@ -75,7 +75,7 @@ class ExitOnKey(Effect):
         pass
 
     def process_event(self, event: Any) -> Any:
-        if event.key_code in (ord('1') ,ord('2'),
+        if event.key_code in (ord('1'), ord('2'),
                               ord('3'), ord('4'), ord('5'), ord('6')):
             self.key = event.key_code
             raise StopApplication("key pressed")

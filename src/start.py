@@ -14,11 +14,15 @@ from mazegen.cell import Cell
 from option_menu import play_option_menu
 from intro_animation import play_intro
 import mazeparser
-from mazegen.mazegen_algo import generat_maze, check_42
+from mazegen.mazegen_algo import generat_maze, check_42 
 from output_file import generate_output_file
 from pyfiglet import figlet_format
 from solve_maze_algo import different_color, maze_solve, maze_visualization
 import visualize_maze as vizualizer
+try:
+    import visualize_maze
+except ImportError:
+    pass
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]
@@ -47,6 +51,8 @@ def main() -> None:
     color = "default"
     maze: Optional[Maze] = None
     config: Optional[Config] = None
+    show_path = True
+    color = "default"
     while True:
         result = mazeparser.parse_maze_config()
         option: int = play_option_menu()
@@ -82,26 +88,28 @@ def main() -> None:
                     maze,
                     config,
                     solution,
-                    animate=True,
+                    animate=show_path,
                     delay=0.1,
                 )
                 vizualizer.visualize_cell_maze(
                     maze,
                     config,
                     clear_screen=True,
+                    has_path=show_path,
                 )
             else:
                 different_color(
                     maze,
                     config,
                     solution,
-                    animate=True,
+                    animate=show_path,
                     delay=0.1,
                 )
                 vizualizer.visualize_cell_maze_different_color(
                     maze,
                     config,
                     clear_screen=True,
+                    has_path=show_path,
                 )
             generate_output_file(maze, config, solution)
             wait_for_keypress()
@@ -120,12 +128,14 @@ def main() -> None:
                     maze,
                     config,
                     clear_screen=True,
+                    has_path=show_path,
                 )
             elif maze is not None and color == "default":
                 vizualizer.visualize_cell_maze(
                     maze,
                     config,
                     clear_screen=True,
+                    has_path=show_path,
                 )
             else:
                 os.system("clear")
@@ -139,10 +149,55 @@ def main() -> None:
 
         elif option == 4:
             os.system("clear")
+            try:
+                if show_path is True:
+                    show_path = False
+                    if color == "default":
+                        vizualizer.visualize_cell_maze(
+                            maze,
+                            config,
+                            clear_screen=True,
+                            has_path=show_path,
+                        )
+                    else:
+                        vizualizer.visualize_cell_maze_different_color(
+                            maze,
+                            config,
+                            clear_screen=True,
+                            has_path=show_path,
+                        )
+                elif show_path is False:
+                    show_path = True
+                    if color == "default":
+                        vizualizer.visualize_cell_maze(
+                            maze,
+                            config,
+                            clear_screen=True,
+                            has_path=show_path,
+                        )
+                    else:
+                        vizualizer.visualize_cell_maze_different_color(
+                            maze,
+                            config,
+                            clear_screen=True,
+                            has_path=show_path,
+                        )
+
+            except Exception:
+                print(
+                    figlet_format(
+                        "Generate a maze first to to toggle the path",
+                        font="big"
+                    )
+                )
+            wait_for_keypress()
+
+        elif option == 5:
+            os.system("clear")
             print(figlet_format("Try Again!", font="slant"))
             return
 
-        elif option == 5:
+        elif option == 6:
             os.system("clear")
             os.system("make fclean")
             return

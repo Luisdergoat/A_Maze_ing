@@ -314,8 +314,7 @@ def visualize_cell_maze(
     cell_maze: CellMaze,
     config: ConfigMapping | None,
     clear_screen: bool = False,
-    show_config: bool = True,
-    show_table: bool = True,
+    has_path: bool = True
 ) -> None:
     """
     Visualisiert ein Maze aus Cell-Objekten.
@@ -373,15 +372,9 @@ def visualize_cell_maze(
         exit_x,
         exit_y,
         cell_maze=cell_maze,
+        has_path=has_path,
         has_frame=has_frame,
     )
-
-    if show_config:
-        from rich.align import Align
-
-        config_panel = print_config_info(config)
-        console.print(Align.center(config_panel))
-        console.print()
 
     if clear_screen:
         console.clear()
@@ -393,8 +386,7 @@ def visualize_cell_maze_different_color(
     cell_maze: CellMaze,
     config: ConfigMapping | None,
     clear_screen: bool = False,
-    show_config: bool = True,
-    show_table: bool = True,
+    has_path: bool = True
 ) -> None:
     """
     Visualisiert ein Maze aus Cell-Objekten.
@@ -454,47 +446,13 @@ def visualize_cell_maze_different_color(
         exit_y,
         cell_maze=cell_maze,
         has_frame=has_frame,
+        has_path=has_path,
     )
-
-    if show_config:
-        from rich.align import Align
-
-        config_panel = print_config_info(config)
-        console.print(Align.center(config_panel))
-        console.print()
 
     if clear_screen:
         console.clear()
 
     console.print(panel, justify="center")
-
-
-def print_config_info(config: ConfigMapping) -> Table:
-    """
-    Zeigt die Config-Informationen mit Rich an.
-    """
-    table = Table(
-        title=(
-            "[bold cyan]Maze "
-            "Konfiguration[/bold cyan]"
-        ),
-        box=box.ROUNDED,
-        border_style="cyan",
-    )
-    table.add_column("Parameter", style="yellow")
-    table.add_column("Wert", style="green")
-
-    entry, exit_pos = _get_entry_exit(config)
-    table.add_row("Breite", str(config.get("WIDTH", "N/A")))
-    table.add_row("Höhe", str(config.get("HEIGHT", "N/A")))
-    table.add_row("Entry", f"{entry[0]}, {entry[1]}")
-    table.add_row("Exit", f"{exit_pos[0]}, {exit_pos[1]}")
-    table.add_row(
-        "Perfect",
-        str(config.get("PERFECT", "N/A")),
-    )
-
-    return table
 
 
 def print_maze_visual_rich(
@@ -507,6 +465,7 @@ def print_maze_visual_rich(
     exit_y: int,
     cell_maze: Optional[CellMaze] = None,
     has_frame: bool = False,
+    has_path: bool = True,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Panel:
     """
@@ -586,7 +545,7 @@ def print_maze_visual_rich(
                 line.append(" X ", style="bold red")
             elif is_frame:
                 line.append("███", style="bold red")
-            elif is_solving:
+            elif is_solving and has_path:
                 line.append(" ■ ", style="bold blue")
 
             else:
@@ -673,6 +632,7 @@ def change_maze_color(
     exit_y: int,
     cell_maze: Optional[CellMaze] = None,
     has_frame: bool = False,
+    has_path: bool = True,
     current_pos: Optional[Tuple[int, int]] = None,
 ) -> Panel:
     """
@@ -752,7 +712,7 @@ def change_maze_color(
                 line.append(" X ", style="bold red")
             elif is_frame:
                 line.append("███", style="bold cyan")
-            elif is_solving:
+            elif is_solving and has_path:
                 line.append(" ■ ", style="bold blue")
             else:
                 line.append("   ")
@@ -862,8 +822,6 @@ def visualize_maze(config_path: str) -> None:
     if 0 <= exit_y < height and 0 <= exit_x < width:
         maze[exit_y][exit_x] = 0
 
-    # Zeige Config-Info
-    console.print(print_config_info(config))
     console.print()
 
     # Zeige visuelles Maze
