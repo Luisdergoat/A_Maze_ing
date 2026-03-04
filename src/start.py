@@ -56,12 +56,11 @@ def main() -> None:
             option = 0
 
         if option == 1:
-            os.system("clear")
             if result is None:
-                print("CONFIG ERRROR")
+                wait_for_keypress()
                 continue
             maze, config = result
-
+            os.system("clear")
             generat_maze(
                 maze,
                 config,
