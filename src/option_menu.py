@@ -75,8 +75,8 @@ class ExitOnKey(Effect):
         pass
 
     def process_event(self, event: Any) -> Any:
-        if event.key_code in (ord('1'),
-                              ord('2'), ord('3'), ord('4'), ord('5')):
+        if event.key_code in (ord('1') ,ord('2'),
+                              ord('3'), ord('4'), ord('5'), ord('6')):
             self.key = event.key_code
             raise StopApplication("key pressed")
         return event
@@ -95,14 +95,16 @@ def _options(screen: Screen) -> int | None:
     generate_maze = "1: Generate Maze"
     edit_config = "2: Edit config"
     change_colour = "3: Change colours"
-    normal_exit = "4: Exit without cleanup"
-    clean_exit = "5: Exit with cleanup"
+    show_path = "4: Toggle solution path"
+    normal_exit = "5: Exit without cleanup"
+    clean_exit = "6: Exit with cleanup"
     star_count = terminal_size.columns + terminal_size.lines
     exit_effect = ExitOnKey(screen)
     options = [
             generate_maze,
             edit_config,
             change_colour,
+            show_path,
             normal_exit,
             clean_exit,
             ]
