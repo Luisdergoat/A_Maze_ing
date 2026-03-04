@@ -6,7 +6,7 @@
 #    By: jdreissi <jdreissi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 00:00:00 by lunsold           #+#    #+#              #
-#    Updated: 2026/03/02 19:24:01 by jdreissi         ###   ########.fr        #
+#    Updated: 2026/03/04 15:05:24 by jdreissi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -64,7 +64,7 @@ run: install
 	@echo "$(BLUE)🎮 Running maze generator...$(RESET)"
 	@PYTHONPATH=$(SRC_DIR) $(PYTHON) $(MAIN) $(ARGS)
 
-debug: install 
+debug: install
 	@echo "$(BLUE)🐞 Running in debug mode...$(RESET)"
 	$(DEGUGG_MODE) $(MAIN) $(ARGS)
 	@echo "$(GREEN)✅ Debugging session ended!$(RESET)"
@@ -114,5 +114,8 @@ help:
 	@echo "  make fclean     - Remove venv and all generated files"
 	@echo "  make re         - Full reinstall"
 	@echo ""
+
+%:
+	@true
 
 .PHONY: all install run clean fclean re help activate

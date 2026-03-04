@@ -13,7 +13,7 @@ from .cell import Cell
 try:
     import visualize_maze
 except ImportError:
-    visualize_maze = None
+    pass
 
 ConfigValue = Union[int, bool, str, Tuple[int, int]]
 Config = Dict[str, ConfigValue]

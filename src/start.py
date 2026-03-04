@@ -101,7 +101,7 @@ def main() -> None:
             generate_output_file(maze, config, solution)
             wait_for_keypress()
         elif option == 2:
-            os.system("nvim config.txt")
+            os.system(f"nvim {sys.argv[1]}")
             continue
 
         elif option == 3:
