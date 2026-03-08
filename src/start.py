@@ -14,7 +14,7 @@ from mazegen.cell import Cell
 from option_menu import play_option_menu
 from intro_animation import play_intro
 import mazeparser
-from mazegen.mazegen_algo import generat_maze, check_42 
+from mazegen.mazegen_algo import generat_maze, check_42
 from output_file import generate_output_file
 from pyfiglet import figlet_format
 from solve_maze_algo import different_color, maze_solve, maze_visualization
@@ -63,8 +63,8 @@ def main() -> None:
 
         if option == 1:
             if result is None:
-                wait_for_keypress()
-                continue
+                print("ERROR: Invalid maze configuration.")
+                return
             maze, config = result
             os.system("clear")
             generat_maze(
@@ -114,8 +114,13 @@ def main() -> None:
             generate_output_file(maze, config, solution)
             wait_for_keypress()
         elif option == 2:
-            os.system(f"nvim {sys.argv[1]}")
-            continue
+            try:
+                os.system("clear")
+                os.system(f"nvim {sys.argv[1]}")
+            except Exception:
+                print("Please provide a file to edit.")
+                print("Usage: make run config=<file.txt>")
+                return
 
         elif option == 3:
             if color == "default":
