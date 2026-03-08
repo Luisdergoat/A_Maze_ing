@@ -36,8 +36,8 @@ MAIN		= a_maze_ing.py
 
 # ================================ TARGETS ================================= #
 
-all: run
-
+all: install
+# Need the config as arg as well
 # Install dependencies in virtual environment
 install: $(VENV)/bin/activate requirements.txt
 	@echo "$(BLUE)📦 Installing dependencies...$(RESET)"
@@ -45,6 +45,7 @@ install: $(VENV)/bin/activate requirements.txt
 	@$(PIP) install -r requirements.txt
 	@echo "$(GREEN)✅ Dependencies installed successfully!$(RESET)"
 	@echo "$(YELLOW)💡 Virtual environment created at: $(VENV)$(RESET)"
+	@echo "$(BLUE)📝 Start the programm with make run and the config as Arg"
 
 # Create virtual environment
 $(VENV)/bin/activate:

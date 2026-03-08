@@ -63,7 +63,8 @@ def main() -> None:
 
         if option == 1:
             if result is None:
-                print("ERROR: Invalid maze configuration.")
+                print("ERROR: Invalid maze configuration. You may "
+                      "forgot the config as Argument")
                 return
             maze, config = result
             os.system("clear")
