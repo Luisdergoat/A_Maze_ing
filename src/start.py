@@ -129,14 +129,22 @@ def main() -> None:
             elif color == "changed":
                 color = "default"
 
-            if maze is not None and color == "changed":
+            if (
+                maze is not None
+                and config is not None
+                and color == "changed"
+            ):
                 vizualizer.visualize_cell_maze_different_color(
                     maze,
                     config,
                     clear_screen=True,
                     has_path=show_path,
                 )
-            elif maze is not None and color == "default":
+            elif (
+                maze is not None
+                and config is not None
+                and color == "default"
+            ):
                 vizualizer.visualize_cell_maze(
                     maze,
                     config,
@@ -155,47 +163,48 @@ def main() -> None:
 
         elif option == 4:
             os.system("clear")
-            try:
-                if show_path is True:
-                    show_path = False
-                    if color == "default":
-                        vizualizer.visualize_cell_maze(
-                            maze,
-                            config,
-                            clear_screen=True,
-                            has_path=show_path,
-                        )
-                    else:
-                        vizualizer.visualize_cell_maze_different_color(
-                            maze,
-                            config,
-                            clear_screen=True,
-                            has_path=show_path,
-                        )
-                elif show_path is False:
-                    show_path = True
-                    if color == "default":
-                        vizualizer.visualize_cell_maze(
-                            maze,
-                            config,
-                            clear_screen=True,
-                            has_path=show_path,
-                        )
-                    else:
-                        vizualizer.visualize_cell_maze_different_color(
-                            maze,
-                            config,
-                            clear_screen=True,
-                            has_path=show_path,
-                        )
-
-            except Exception:
+            if maze is None or config is None:
                 print(
                     figlet_format(
                         "Generate a maze first to to toggle the path",
                         font="big"
                     )
                 )
+                wait_for_keypress()
+                continue
+
+            if show_path is True:
+                show_path = False
+                if color == "default":
+                    vizualizer.visualize_cell_maze(
+                        maze,
+                        config,
+                        clear_screen=True,
+                        has_path=show_path,
+                    )
+                else:
+                    vizualizer.visualize_cell_maze_different_color(
+                        maze,
+                        config,
+                        clear_screen=True,
+                        has_path=show_path,
+                    )
+            elif show_path is False:
+                show_path = True
+                if color == "default":
+                    vizualizer.visualize_cell_maze(
+                        maze,
+                        config,
+                        clear_screen=True,
+                        has_path=show_path,
+                    )
+                else:
+                    vizualizer.visualize_cell_maze_different_color(
+                        maze,
+                        config,
+                        clear_screen=True,
+                        has_path=show_path,
+                    )
             wait_for_keypress()
 
         elif option == 5:
